@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GOBAK CHAT - SOON</title>
+    <style>
+        /* Sayfa ve arka plan ayarları */
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Arial', sans-serif;
+            /* Türkiye bayrağı arka planı ve yazının okunabilmesi için hafif siyah katman */
+            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), 
+                        url('https://upload.wikimedia.org/wikipedia/commons/b/b4/Flag_of_Turkey.svg') center/cover no-repeat;
+            color: white;
+            text-align: center;
+            overflow: hidden;
+        }
+
+        /* Ana başlık: GOBAK CHAT */
+        h1 {
+            font-size: 5rem;
+            margin: 0;
+            letter-spacing: 2px;
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.8);
+            text-transform: uppercase;
+        }
+
+        /* Alt başlık: SOON. */
+        h2 {
+            font-size: 2.5rem;
+            margin: 15px 0;
+            letter-spacing: 8px;
+            color: #f1f1f1;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+        }
+
+        /* Yapan kişi: By: ömerbabapiromax */
+        .creator {
+            font-size: 1.2rem;
+            margin-top: 40px;
+            font-style: italic;
+            opacity: 0.9;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 10px 20px;
+            border-radius: 5px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        /* Mobil cihazlar için boyutlandırma */
+        @media (max-width: 600px) {
+            h1 { font-size: 3rem; }
+            h2 { font-size: 1.8rem; }
+            .creator { font-size: 1rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>GOBAK CHAT</h1>
+    <h2>SOON.</h2>
+    <div class="creator">By: ömerbabapiromax</div>
+
+</body>
+</html>
