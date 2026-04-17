@@ -2,73 +2,48 @@ const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
 const fs = require('fs');
-const path = require('path');
 
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
-const PORT = process.env.PORT || 3000;
-const DB_FILE = 'database.json';
+const DB = 'mesajlar.json';
 
-// Mesajları kalıcı tutmak için dosyadan oku
-let messages = [];
-if (fs.existsSync(DB_FILE)) {
-    try {
-        messages = JSON.parse(fs.readFileSync(DB_FILE, 'utf-8'));
-    } catch (e) {
-        messages = [];
-    }
+// Mesajları dosyadan yükle (Asla silinmez)
+let database = { messages: [] };
+if (fs.existsSync(DB)) {
+    database = JSON.parse(fs.readFileSync(DB));
 }
 
-// Aktif kullanıcıları takip et
 let activeUsers = {};
 
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
-});
+app.get('/', (req, res) => res.sendFile(__dirname + '/index.html'));
 
 io.on('connection', (socket) => {
-    console.log('Yeni bir bağlantı:', socket.id);
+    // Bağlanan kişiye eski mesajları yolla
+    socket.emit('old-messages', database.messages);
 
-    // Yeni giren kullanıcıya geçmiş mesajları gönder
-    socket.emit('loadMessages', messages);
-
-    socket.on('join', (username) => {
-        socket.username = username;
-        activeUsers[socket.id] = username;
-        
-        // Herkese güncel kullanıcı listesini gönder
-        io.emit('updateUserList', Object.values(activeUsers));
-        console.log(`${username} katıldı.`);
+    socket.on('join', (name) => {
+        socket.username = name;
+        activeUsers[socket.id] = name;
+        io.emit('update-users', Object.values(activeUsers));
     });
 
-    socket.on('sendMessage', (text) => {
-        if (!socket.username) return;
-
-        const msgData = {
-            user: socket.username,
-            text: text,
-            time: new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })
+    socket.on('chat-msg', (msg) => {
+        const data = { 
+            user: socket.username, 
+            text: msg, 
+            time: new Date().toLocaleTimeString('tr-TR', {hour:'2-digit', minute:'2-digit'}) 
         };
-
-        messages.push(msgData);
-        
-        // Mesajı dosyaya kaydet (Sıfırlanmaması için)
-        fs.writeFileSync(DB_FILE, JSON.stringify(messages, null, 2));
-
-        // Mesajı herkese gönder
-        io.emit('newIncomingMessage', msgData);
+        database.messages.push(data);
+        fs.writeFileSync(DB, JSON.stringify(database)); // Kaydet
+        io.emit('new-msg', data);
     });
 
     socket.on('disconnect', () => {
-        if (socket.username) {
-            delete activeUsers[socket.id];
-            io.emit('updateUserList', Object.values(activeUsers));
-        }
+        delete activeUsers[socket.id];
+        io.emit('update-users', Object.values(activeUsers));
     });
 });
 
-server.listen(PORT, () => {
-    console.log(`Mega Chat ${PORT} portunda hazır!`);
-});
+server.listen(3000, () => console.log('Sistem 3000 portunda devrede!'));
