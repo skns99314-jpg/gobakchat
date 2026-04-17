@@ -1,207 +1,58 @@
-<!DOCTYPE html>
-<html lang="tr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GOBAK CHAT | SOON</title>
-    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@700&family=Poppins:wght@300;600&display=swap" rel="stylesheet">
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
-        body, html {
-            width: 100%;
-            height: 100%;
-            font-family: 'Poppins', sans-serif;
-            background-color: #000;
-            color: white;
-            overflow: hidden;
-        }
+<div id="login">
+    <input id="username" placeholder="Kullanıcı Adın...">
+    <button onclick="join()">Giriş Yap</button>
+</div>
 
-        /* Sabit Wikipedia Bayrağı */
-        .bg {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            background: linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.75)), 
-                        url('https://upload.wikimedia.org/wikipedia/commons/b/b4/Flag_of_Turkey.svg') center/cover no-repeat;
-        }
-
-        /* Live Viewers Paneli */
-        .live-counter {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: rgba(0, 0, 0, 0.6);
-            padding: 10px 20px;
-            border-radius: 50px;
-            border: 1px solid #ff0000;
-            backdrop-filter: blur(5px);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            z-index: 100;
-        }
-
-        .pulse-dot {
-            height: 10px;
-            width: 10px;
-            background-color: #ff0000;
-            border-radius: 50%;
-            box-shadow: 0 0 10px #ff0000;
-            animation: pulse 1s infinite;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.3); opacity: 0.5; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-
-        /* Ana İçerik */
-        .main {
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-        }
-
-        h1 {
-            font-family: 'Oswald', sans-serif;
-            font-size: clamp(3rem, 12vw, 7rem);
-            letter-spacing: 10px;
-            text-shadow: 0 0 30px rgba(255, 0, 0, 0.5);
-        }
-
-        .tagline {
-            font-size: 1.5rem;
-            letter-spacing: 15px;
-            color: #ff4d4d;
-            margin-bottom: 50px;
-            text-transform: uppercase;
-        }
-
-        /* Sayaç Kutuları */
-        .timer {
-            display: flex;
-            gap: 25px;
-        }
-
-        .unit {
-            display: flex;
-            flex-direction: column;
-            background: rgba(0, 0, 0, 0.7);
-            padding: 20px;
-            border-radius: 15px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            min-width: 100px;
-        }
-
-        .val {
-            font-family: 'Oswald', sans-serif;
-            font-size: 3.5rem;
-            line-height: 1;
-            color: #fff;
-        }
-
-        .label {
-            font-size: 0.8rem;
-            color: #888;
-            margin-top: 5px;
-            letter-spacing: 2px;
-        }
-
-        .owner {
-            margin-top: 60px;
-            opacity: 0.6;
-            font-weight: 300;
-            font-size: 1.1rem;
-        }
-
-        .owner strong { color: #fff; }
-
-        @media (max-width: 600px) {
-            .timer { gap: 10px; }
-            .unit { min-width: 70px; padding: 10px; }
-            .val { font-size: 2rem; }
-        }
-    </style>
-</head>
-<body>
-
-    <div class="bg"></div>
-
-    <div class="live-counter">
-        <span class="pulse-dot"></span>
-        <span id="vCount">BAĞLANILIYOR...</span>
-    </div>
-
-    <div class="main">
-        <h1>GOBAK CHAT</h1>
-        <div class="tagline">YAKINDA SİZLERLE</div>
-
-        <div class="timer">
-            <div class="unit"><span class="val" id="d">00</span><span class="label">GÜN</span></div>
-            <div class="unit"><span class="val" id="h">00</span><span class="label">SAAT</span></div>
-            <div class="unit"><span class="val" id="m">00</span><span class="label">DK</span></div>
-            <div class="unit"><span class="val" id="s">00</span><span class="label">SN</span></div>
+<div id="chat-box" style="display:none;">
+    <div style="display:flex;">
+        <div id="messages" style="flex:3; height:400px; overflow-y:scroll; border:1px solid #ccc;"></div>
+        <div id="users" style="flex:1; border:1px solid #ccc; margin-left:10px;">
+            <strong>Aktifler:</strong>
+            <ul id="userList"></ul>
         </div>
-
-        <div class="owner">By: <strong>ömerbabapiromax</strong></div>
     </div>
+    <input id="msgInput" placeholder="Mesaj yaz...">
+    <button onclick="send()">Gönder</button>
+</div>
 
-    <script>
-        // --- CANLI İZLEYİCİ SİMÜLASYONU ---
-        function updateViewers() {
-            let base = 74; 
-            let rand = Math.floor(Math.random() * 20); 
-            document.getElementById('vCount').innerText = (base + rand) + " AKTİF KULLANICI";
+<script src="/socket.io/socket.io.js"></script>
+<script>
+    const socket = io();
+    let myName = "";
+
+    function join() {
+        myName = document.getElementById('username').value;
+        if(myName) {
+            document.getElementById('login').style.display = 'none';
+            document.getElementById('chat-box').style.display = 'block';
+            socket.emit('join', myName);
         }
-        setInterval(updateViewers, 3000);
-        updateViewers();
+    }
 
-        // --- GLOBAL GERİ SAYIM MANTIĞI ---
-        // Bu mantıkta ilk giren kişi süreyi başlatır ve süre herkes için aynı kalır.
-        // Veritabanı olmadığı için tarayıcı belleğini (localStorage) kullanıyoruz.
-        
-        let globalStartTime = localStorage.getItem('gobak_global_start');
-
-        if (!globalStartTime) {
-            // Eğer sistemde kayıtlı bir başlangıç yoksa (ilk kez birisi girdiyse)
-            globalStartTime = new Date().getTime();
-            localStorage.setItem('gobak_global_start', globalStartTime);
+    function send() {
+        const input = document.getElementById('msgInput');
+        if(input.value) {
+            socket.emit('newMessage', input.value);
+            input.value = '';
         }
+    }
 
-        // 5 Günlük Süre (milisaniye cinsinden)
-        const duration = 5 * 24 * 60 * 60 * 1000;
-        const targetDate = parseInt(globalStartTime) + duration;
+    socket.on('message', data => {
+        const div = document.createElement('div');
+        div.innerHTML = `<b>${data.user}:</b> ${data.text} <small>${data.time}</small>`;
+        document.getElementById('messages').appendChild(div);
+    });
 
-        function updateTimer() {
-            const now = new Date().getTime();
-            const diff = targetDate - now;
+    socket.on('previousMessages', msgs => {
+        msgs.forEach(data => {
+            const div = document.createElement('div');
+            div.innerHTML = `<b>${data.user}:</b> ${data.text} <small>${data.time}</small>`;
+            document.getElementById('messages').appendChild(div);
+        });
+    });
 
-            if (diff <= 0) {
-                document.querySelector(".timer").innerHTML = "<h2 style='color:#ff0000; font-size:2rem; font-family:Oswald;'>SİSTEM ÇEVRİMİÇİ!</h2>";
-                return;
-            }
-
-            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-            const secs = Math.floor((diff % (1000 * 60)) / 1000);
-
-            document.getElementById('d').innerText = days.toString().padStart(2, '0');
-            document.getElementById('h').innerText = hours.toString().padStart(2, '0');
-            document.getElementById('m').innerText = mins.toString().padStart(2, '0');
-            document.getElementById('s').innerText = secs.toString().padStart(2, '0');
-        }
-
-        setInterval(updateTimer, 1000);
-        updateTimer();
-    </script>
-</body>
-</html>
+    socket.on('updateUserList', users => {
+        const list = document.getElementById('userList');
+        list.innerHTML = users.map(u => `<li>${u}</li>`).join('');
+    });
+</script>
