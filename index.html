@@ -2,132 +2,138 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>GOBAK CHAT | YAKINDA</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GOBAK CHAT | MEGA VERCEL</title>
+    
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp, setDoc, doc, deleteDoc, onIdTokenChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        // ÖNEMLİ: Kendi Firebase bilgilerini buraya girmelisin. 
+        // Firebase Console > Project Settings kısmından alabilirsin.
+        const firebaseConfig = {
+            apiKey: "AIzaSy...", 
+            authDomain: "projen.firebaseapp.com",
+            projectId: "projen-id",
+            storageBucket: "projen.appspot.com",
+            messagingSenderId: "12345",
+            appId: "1:12345:web:abc"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Değişkenler
+        let myName = "";
+
+        // --- GİRİŞ YAPMA ---
+        window.joinChat = async () => {
+            myName = document.getElementById('nick').value.trim();
+            if(myName.length < 2) return alert("İsim yaz!");
+
+            document.getElementById('login-view').style.display = 'none';
+            document.getElementById('chat-view').style.display = 'grid';
+
+            // Aktif üyelere ekle
+            await setDoc(doc(db, "activeUsers", myName), { name: myName, time: Date.now() });
+        };
+
+        // --- MESAJ GÖNDERME ---
+        window.sendMsg = async () => {
+            const inp = document.getElementById('mInp');
+            if(inp.value.trim()) {
+                await addDoc(collection(db, "messages"), {
+                    user: myName,
+                    text: inp.value,
+                    createdAt: serverTimestamp()
+                });
+                inp.value = '';
+            }
+        };
+
+        // --- CANLI MESAJLARI DİNLE ---
+        const qMessages = query(collection(db, "messages"), orderBy("createdAt", "asc"));
+        onSnapshot(qMessages, (snapshot) => {
+            const area = document.getElementById('msg-area');
+            area.innerHTML = '';
+            snapshot.forEach((doc) => {
+                const d = doc.data();
+                const isMe = d.user === myName;
+                area.innerHTML += `
+                    <div class="msg ${isMe ? 'mine' : 'others'}">
+                        <div class="info">${d.user}</div>
+                        <div>${d.text}</div>
+                    </div>`;
+            });
+            area.scrollTop = area.scrollHeight;
+        });
+
+        // --- CANLI AKTİF ÜYELERİ DİNLE ---
+        onSnapshot(collection(db, "activeUsers"), (snapshot) => {
+            const list = document.getElementById('u-list');
+            list.innerHTML = '';
+            snapshot.forEach((doc) => {
+                list.innerHTML += `<div class="u-tag">● ${doc.data().name}</div>`;
+            });
+        });
+
+        // Çıkış yapınca aktiflerden sil
+        window.onbeforeunload = () => { if(myName) deleteDoc(doc(db, "activeUsers", myName)); };
+    </script>
+
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
-        body { background: #000; color: white; height: 100vh; overflow: hidden; }
+        * { margin:0; padding:0; box-sizing:border-box; font-family: 'Poppins', sans-serif; }
+        body { background:#000; color:#fff; height:100vh; overflow:hidden; }
+        .bg { position:fixed; top:0; left:0; width:100%; height:100%; z-index:-1;
+              background: linear-gradient(rgba(0,0,0,0.9), rgba(0,0,0,0.9)), 
+              url('https://upload.wikimedia.org/wikipedia/commons/b/b4/Flag_of_Turkey.svg') center/cover; }
 
-        /* Arka Plan Bayrak (Sabit) */
-        .bg {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
-            background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8)), 
-                        url('https://upload.wikimedia.org/wikipedia/commons/b/b4/Flag_of_Turkey.svg') center/cover no-repeat;
-        }
+        /* GİRİŞ */
+        #login-view { height:100vh; display:flex; justify-content:center; align-items:center; }
+        .box { background:rgba(255,255,255,0.05); padding:40px; border-radius:25px; border:1px solid #333; text-align:center; backdrop-filter:blur(15px); }
+        input { background:#111; border:1px solid #333; color:#fff; padding:12px; border-radius:10px; width:100%; outline:none; margin:15px 0; }
+        button { background:#ff0000; color:#fff; border:none; padding:12px 25px; border-radius:10px; cursor:pointer; font-weight:bold; }
 
-        /* --- GİRİŞ EKRANI --- */
-        #view-login {
-            height: 100vh; display: flex; justify-content: center; align-items: center;
-        }
-        .login-card {
-            background: rgba(255,255,255,0.05); backdrop-filter: blur(15px);
-            padding: 40px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1);
-            width: 350px; text-align: center;
-        }
-        input {
-            width: 100%; padding: 12px; margin: 20px 0; border-radius: 8px;
-            border: none; background: #222; color: #fff; outline: none;
-        }
-        .btn {
-            width: 100%; padding: 12px; background: #ff0000; color: #fff;
-            border: none; border-radius: 8px; cursor: pointer; font-weight: 600;
-        }
+        /* CHAT */
+        #chat-view { display:none; height:100vh; grid-template-columns: 260px 1fr; }
+        .sidebar { background:rgba(0,0,0,0.6); border-right:1px solid #222; padding:25px; }
+        .main { display:flex; flex-direction:column; }
+        #msg-area { flex:1; padding:25px; overflow-y:auto; display:flex; flex-direction:column; gap:12px; }
+        
+        /* Mesaj Balonları */
+        .msg { padding:12px 18px; border-radius:15px; max-width:75%; position:relative; }
+        .mine { align-self:flex-end; background:#ff0000; border-bottom-right-radius:2px; }
+        .others { align-self:flex-start; background:#222; border-bottom-left-radius:2px; }
+        .info { font-size:10px; font-weight:bold; margin-bottom:4px; opacity:0.7; text-transform:uppercase; }
 
-        /* --- CHAT EKRANI (Başta Gizli) --- */
-        #view-chat {
-            display: none; height: 100vh; padding: 20px;
-        }
-        .chat-app {
-            display: grid; grid-template-columns: 250px 1fr; height: 100%;
-            background: rgba(0,0,0,0.6); border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); overflow: hidden;
-        }
-
-        /* Yan Menü (Aktifler) */
-        .side { background: rgba(255,255,255,0.02); border-right: 1px solid rgba(255,255,255,0.05); padding: 20px; }
-        .user-tag { padding: 10px; margin-bottom: 5px; background: rgba(255,255,255,0.05); border-radius: 5px; font-size: 0.9rem; }
-
-        /* Mesaj Alanı */
-        .main { display: flex; flex-direction: column; }
-        #msgs { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
-        .msg-box { max-width: 70%; padding: 10px 15px; border-radius: 12px; font-size: 0.95rem; line-height: 1.4; }
-        .msg-box.me { align-self: flex-end; background: #ff0000; }
-        .msg-box.them { align-self: flex-start; background: #333; }
-        .msg-info { font-size: 0.7rem; opacity: 0.6; margin-bottom: 3px; }
-
-        .input-area { padding: 20px; background: rgba(0,0,0,0.4); display: flex; gap: 10px; }
-        .input-area input { margin: 0; }
-        .btn-send { width: 60px; background: #ff0000; border: none; border-radius: 8px; color: #fff; cursor: pointer; }
+        .input-bar { padding:25px; background:#0a0a0a; display:flex; gap:12px; border-top:1px solid #222; }
+        .u-tag { padding:8px; background:rgba(255,0,0,0.1); border-radius:8px; margin-bottom:10px; font-size:14px; color:#ff4d4d; }
     </style>
 </head>
 <body>
+    <div class="bg"></div>
 
-<div class="bg"></div>
-
-<div id="view-login">
-    <div class="login-card">
-        <h2 style="color:#ff0000">GOBAK CHAT</h2>
-        <input type="text" id="nick" placeholder="Takma adın..." maxlength="12">
-        <button class="btn" onclick="join()">GİRİŞ YAP</button>
-    </div>
-</div>
-
-<div id="view-chat">
-    <div class="chat-app">
-        <div class="side">
-            <h4 style="margin-bottom:15px; color:#ff0000">AKTİF ÜYELER</h4>
-            <div id="user-list"></div>
+    <div id="login-view">
+        <div class="box">
+            <h1 style="color:#ff0000; font-size:2.5rem; letter-spacing:2px">GOBAK CHAT</h1>
+            <p style="opacity:0.5; font-size:0.8rem">Vercel Mega Edition</p>
+            <input type="text" id="nick" placeholder="Takma adını belirle..." maxlength="15">
+            <button onclick="joinChat()" style="width:100%">SİSTEME GİR</button>
         </div>
-        <div class="main">
-            <div id="msgs"></div>
-            <div class="input-area">
-                <input type="text" id="mInp" placeholder="Mesaj yaz..." onkeypress="if(event.key=='Enter') send()">
-                <button class="btn-send" onclick="send()">Gönder</button>
+    </div>
+
+    <div id="chat-view">
+        <aside class="sidebar">
+            <h3 style="color:#ff0000; margin-bottom:20px; font-size:1rem">● AKTİF ÜYELER</h3>
+            <div id="u-list"></div>
+        </aside>
+        <main class="main">
+            <div id="msg-area"></div>
+            <div class="input-bar">
+                <input type="text" id="mInp" placeholder="Bir şeyler yaz..." onkeypress="if(event.key=='Enter') sendMsg()">
+                <button onclick="sendMsg()">GÖNDER</button>
             </div>
-        </div>
+        </main>
     </div>
-</div>
-
-<script>
-    const socket = io();
-    let myName = "";
-
-    function join() {
-        myName = document.getElementById('nick').value.trim();
-        if(myName.length < 2) return alert("İsim yaz!");
-
-        // Ekran değiştirme
-        document.getElementById('view-login').style.display = 'none';
-        document.getElementById('view-chat').style.display = 'block';
-
-        socket.emit('join', myName);
-    }
-
-    function send() {
-        const i = document.getElementById('mInp');
-        if(i.value.trim()) {
-            socket.emit('chat-msg', i.value);
-            i.value = '';
-        }
-    }
-
-    socket.on('new-msg', data => render(data));
-    socket.on('old-messages', msgs => msgs.forEach(m => render(m)));
-    
-    socket.on('update-users', users => {
-        document.getElementById('user-list').innerHTML = users.map(u => `<div class="user-tag">● ${u}</div>`).join('');
-    });
-
-    function render(data) {
-        const box = document.getElementById('msgs');
-        const isMe = data.user === myName;
-        const div = document.createElement('div');
-        div.className = `msg-box ${isMe ? 'me' : 'them'}`;
-        div.innerHTML = `<div class="msg-info">${data.user} • ${data.time}</div><div>${data.text}</div>`;
-        box.appendChild(div);
-        box.scrollTop = box.scrollHeight;
-    }
-</script>
-
 </body>
 </html>
