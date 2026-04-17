@@ -6,7 +6,6 @@
     <title>GOBAK CHAT | SOON</title>
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@700&family=Poppins:wght@300;600&display=swap" rel="stylesheet">
     <style>
-        /* --- CSS Reset & Base --- */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         body, html {
@@ -18,53 +17,51 @@
             overflow: hidden;
         }
 
-        /* --- Sabit Türk Bayrağı Arka Planı --- */
-        .background-container {
+        /* Sabit Wikipedia Bayrağı */
+        .bg {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             z-index: -1;
-            /* Karartma ve Sabit Bayrak */
-            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), 
+            background: linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.75)), 
                         url('https://upload.wikimedia.org/wikipedia/commons/b/b4/Flag_of_Turkey.svg') center/cover no-repeat;
         }
 
-        /* --- Canlı İzleyici (Live Viewers) --- */
-        .live-status {
+        /* Live Viewers Paneli */
+        .live-counter {
             position: fixed;
             top: 20px;
             right: 20px;
-            background: rgba(0, 0, 0, 0.7);
-            padding: 8px 15px;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 10px 20px;
             border-radius: 50px;
-            border: 1px solid rgba(255, 0, 0, 0.5);
-            font-size: 0.85rem;
+            border: 1px solid #ff0000;
+            backdrop-filter: blur(5px);
             display: flex;
             align-items: center;
-            gap: 8px;
-            z-index: 10;
+            gap: 10px;
+            z-index: 100;
         }
 
-        .dot {
-            height: 8px;
-            width: 8px;
+        .pulse-dot {
+            height: 10px;
+            width: 10px;
             background-color: #ff0000;
             border-radius: 50%;
-            display: inline-block;
             box-shadow: 0 0 10px #ff0000;
-            animation: pulse 1.5s infinite;
+            animation: pulse 1s infinite;
         }
 
         @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.3; }
-            100% { opacity: 1; }
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.3); opacity: 0.5; }
+            100% { transform: scale(1); opacity: 1; }
         }
 
-        /* --- Ana İçerik --- */
-        .container {
+        /* Ana İçerik */
+        .main {
             height: 100vh;
             display: flex;
             flex-direction: column;
@@ -75,118 +72,136 @@
 
         h1 {
             font-family: 'Oswald', sans-serif;
-            font-size: clamp(3rem, 10vw, 6rem);
-            letter-spacing: 8px;
-            text-shadow: 0 0 20px rgba(255, 0, 0, 0.6);
-            margin-bottom: 5px;
+            font-size: clamp(3rem, 12vw, 7rem);
+            letter-spacing: 10px;
+            text-shadow: 0 0 30px rgba(255, 0, 0, 0.5);
         }
 
-        .soon-tag {
-            font-size: 1.2rem;
-            letter-spacing: 12px;
+        .tagline {
+            font-size: 1.5rem;
+            letter-spacing: 15px;
             color: #ff4d4d;
-            margin-bottom: 40px;
-            font-weight: 300;
+            margin-bottom: 50px;
+            text-transform: uppercase;
         }
 
-        /* --- Geri Sayım --- */
-        .countdown-wrapper {
+        /* Sayaç Kutuları */
+        .timer {
             display: flex;
-            gap: 20px;
-            background: rgba(255, 255, 255, 0.05);
-            padding: 30px;
-            border-radius: 20px;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            gap: 25px;
         }
 
-        .box {
+        .unit {
             display: flex;
             flex-direction: column;
-            min-width: 80px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 20px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            min-width: 100px;
         }
 
-        .number {
+        .val {
             font-family: 'Oswald', sans-serif;
             font-size: 3.5rem;
+            line-height: 1;
             color: #fff;
         }
 
         .label {
-            font-size: 0.7rem;
-            color: #aaa;
+            font-size: 0.8rem;
+            color: #888;
+            margin-top: 5px;
             letter-spacing: 2px;
         }
 
-        .creator {
-            margin-top: 50px;
-            font-size: 1rem;
-            color: rgba(255,255,255,0.5);
+        .owner {
+            margin-top: 60px;
+            opacity: 0.6;
+            font-weight: 300;
+            font-size: 1.1rem;
         }
 
-        .creator strong { color: #fff; text-shadow: 0 0 5px rgba(255,255,255,0.5); }
+        .owner strong { color: #fff; }
 
-        /* Mobil Ayar */
         @media (max-width: 600px) {
-            .countdown-wrapper { gap: 10px; padding: 15px; }
-            .number { font-size: 2rem; }
-            .box { min-width: 50px; }
+            .timer { gap: 10px; }
+            .unit { min-width: 70px; padding: 10px; }
+            .val { font-size: 2rem; }
         }
     </style>
 </head>
 <body>
 
-    <div class="background-container"></div>
+    <div class="bg"></div>
 
-    <div class="live-status">
-        <span class="dot"></span>
-        <span id="viewerCount">Giriş yapılıyor...</span>
+    <div class="live-counter">
+        <span class="pulse-dot"></span>
+        <span id="vCount">BAĞLANILIYOR...</span>
     </div>
 
-    <div class="container">
+    <div class="main">
         <h1>GOBAK CHAT</h1>
-        <div class="soon-tag">SOON.</div>
+        <div class="tagline">YAKINDA SİZLERLE</div>
 
-        <div class="countdown-wrapper">
-            <div class="box"><span class="number" id="days">00</span><span class="label">GÜN</span></div>
-            <div class="box"><span class="number" id="hours">00</span><span class="label">SAAT</span></div>
-            <div class="box"><span class="number" id="mins">00</span><span class="label">DAKİKA</span></div>
-            <div class="box"><span class="number" id="secs">00</span><span class="label">SANİYE</span></div>
+        <div class="timer">
+            <div class="unit"><span class="val" id="d">00</span><span class="label">GÜN</span></div>
+            <div class="unit"><span class="val" id="h">00</span><span class="label">SAAT</span></div>
+            <div class="unit"><span class="val" id="m">00</span><span class="label">DK</span></div>
+            <div class="unit"><span class="val" id="s">00</span><span class="label">SN</span></div>
         </div>
 
-        <div class="creator">By: <strong>ömerbabapiromax</strong></div>
+        <div class="owner">By: <strong>ömerbabapiromax</strong></div>
     </div>
 
     <script>
-        // --- GERÇEKÇİ İZLEYİCİ SAYACI ---
+        // --- CANLI İZLEYİCİ SİMÜLASYONU ---
         function updateViewers() {
-            // Rastgele ama gerçekçi bir sayı (Örn: 100-150 arası)
-            let count = Math.floor(Math.random() * (150 - 100 + 1)) + 100;
-            document.getElementById('viewerCount').innerText = count + " KİŞİ İZLİYOR";
+            let base = 74; 
+            let rand = Math.floor(Math.random() * 20); 
+            document.getElementById('vCount').innerText = (base + rand) + " AKTİF KULLANICI";
         }
-        setInterval(updateViewers, 5000);
+        setInterval(updateViewers, 3000);
         updateViewers();
 
-        // --- GERİ SAYIM (5 GÜN) ---
-        const target = new Date();
-        target.setDate(target.getDate() + 5);
+        // --- GLOBAL GERİ SAYIM MANTIĞI ---
+        // Bu mantıkta ilk giren kişi süreyi başlatır ve süre herkes için aynı kalır.
+        // Veritabanı olmadığı için tarayıcı belleğini (localStorage) kullanıyoruz.
+        
+        let globalStartTime = localStorage.getItem('gobak_global_start');
 
-        function count() {
-            const now = new Date().getTime();
-            const diff = target - now;
-
-            const d = Math.floor(diff / (1000 * 60 * 60 * 24));
-            const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-            const s = Math.floor((diff % (1000 * 60)) / 1000);
-
-            document.getElementById('days').innerText = d.toString().padStart(2, '0');
-            document.getElementById('hours').innerText = h.toString().padStart(2, '0');
-            document.getElementById('mins').innerText = m.toString().padStart(2, '0');
-            document.getElementById('secs').innerText = s.toString().padStart(2, '0');
+        if (!globalStartTime) {
+            // Eğer sistemde kayıtlı bir başlangıç yoksa (ilk kez birisi girdiyse)
+            globalStartTime = new Date().getTime();
+            localStorage.setItem('gobak_global_start', globalStartTime);
         }
-        setInterval(count, 1000);
-        count();
+
+        // 5 Günlük Süre (milisaniye cinsinden)
+        const duration = 5 * 24 * 60 * 60 * 1000;
+        const targetDate = parseInt(globalStartTime) + duration;
+
+        function updateTimer() {
+            const now = new Date().getTime();
+            const diff = targetDate - now;
+
+            if (diff <= 0) {
+                document.querySelector(".timer").innerHTML = "<h2 style='color:#ff0000; font-size:2rem; font-family:Oswald;'>SİSTEM ÇEVRİMİÇİ!</h2>";
+                return;
+            }
+
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const secs = Math.floor((diff % (1000 * 60)) / 1000);
+
+            document.getElementById('d').innerText = days.toString().padStart(2, '0');
+            document.getElementById('h').innerText = hours.toString().padStart(2, '0');
+            document.getElementById('m').innerText = mins.toString().padStart(2, '0');
+            document.getElementById('s').innerText = secs.toString().padStart(2, '0');
+        }
+
+        setInterval(updateTimer, 1000);
+        updateTimer();
     </script>
 </body>
 </html>
