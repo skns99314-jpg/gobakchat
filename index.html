@@ -3,301 +3,99 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GOBAK CHAT | SOON</title>
+    <title>GOBAK CHAT | MEGA PREMIUM</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Oswald:wght@700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root {
-            --primary-color: #ff0000;
-            --glass-bg: rgba(20, 20, 20, 0.85);
-            --border-color: rgba(255, 255, 255, 0.1);
-        }
-
+        :root { --p: #ff0000; --bg: #0a0a0a; --glass: rgba(20, 20, 20, 0.9); }
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Poppins', sans-serif; background: var(--bg); color: #fff; height: 100vh; overflow: hidden; }
 
-        body, html {
-            height: 100%;
-            font-family: 'Poppins', sans-serif;
-            background: #000;
-            color: white;
-            overflow: hidden;
-        }
-
-        /* Video veya Yüksek Kalite Arka Plan */
-        .video-bg {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            z-index: -1;
-            background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8)), 
+        /* Arka Plan */
+        .bg-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
+            background: linear-gradient(rgba(0,0,0,0.85), rgba(0,0,0,0.85)), 
                         url('https://upload.wikimedia.org/wikipedia/commons/b/b4/Flag_of_Turkey.svg') center/cover no-repeat;
-            filter: blur(5px);
-            transform: scale(1.1);
         }
 
-        /* --- GİRİŞ EKRANI (Ortalanmış) --- */
-        #login-screen {
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            transition: 0.5s;
+        /* Giriş Ekranı */
+        #login-view {
+            height: 100vh; display: flex; justify-content: center; align-items: center;
+        }
+        .login-box {
+            background: var(--glass); padding: 40px; border-radius: 30px; border: 1px solid rgba(255,255,255,0.1);
+            text-align: center; width: 100%; max-width: 400px; backdrop-filter: blur(20px);
+            box-shadow: 0 20px 50px rgba(0,0,0,1);
+        }
+        .login-box h1 { font-family: 'Oswald'; font-size: 3rem; color: var(--p); margin-bottom: 10px; }
+        .login-box input {
+            width: 100%; padding: 15px; border-radius: 12px; border: 1px solid #333; background: #1a1a1a;
+            color: #fff; margin: 20px 0; outline: none; transition: 0.3s;
+        }
+        .login-box input:focus { border-color: var(--p); }
+        .login-btn {
+            width: 100%; padding: 15px; background: var(--p); border: none; border-radius: 12px;
+            color: #fff; font-weight: 600; cursor: pointer; transition: 0.3s;
+        }
+        .login-btn:hover { transform: scale(1.02); background: #cc0000; }
+
+        /* Chat Ekranı */
+        #chat-view { display: none; height: 100vh; padding: 20px; }
+        .chat-window {
+            display: grid; grid-template-columns: 280px 1fr; height: 100%;
+            background: var(--glass); border-radius: 25px; border: 1px solid rgba(255,255,255,0.1); overflow: hidden;
         }
 
-        .login-card {
-            background: var(--glass-bg);
-            backdrop-filter: blur(20px);
-            padding: 40px;
-            border-radius: 25px;
-            border: 1px solid var(--border-color);
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-            width: 400px;
-            text-align: center;
-            animation: fadeIn 0.8s ease;
-        }
-
-        .login-card h1 {
-            font-family: 'Oswald', sans-serif;
-            font-size: 2.5rem;
-            margin-bottom: 20px;
-            letter-spacing: 3px;
-            color: var(--primary-color);
-        }
-
-        .input-group {
-            margin-bottom: 20px;
-            position: relative;
-        }
-
-        .input-group input {
-            width: 100%;
-            padding: 15px 20px;
-            background: rgba(255,255,255,0.05);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            color: white;
-            font-size: 1rem;
-            outline: none;
-            transition: 0.3s;
-        }
-
-        .input-group input:focus {
-            border-color: var(--primary-color);
-            background: rgba(255,255,255,0.1);
-        }
-
-        .btn-join {
-            width: 100%;
-            padding: 15px;
-            background: var(--primary-color);
-            border: none;
-            border-radius: 12px;
-            color: white;
-            font-weight: 600;
-            font-size: 1.1rem;
-            cursor: pointer;
-            transition: 0.3s;
-            box-shadow: 0 5px 15px rgba(255, 0, 0, 0.3);
-        }
-
-        .btn-join:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(255, 0, 0, 0.5);
-        }
-
-        /* --- CHAT EKRANI (Gelişmiş) --- */
-        #chat-screen {
-            display: none;
-            height: 100vh;
-            padding: 20px;
-            animation: fadeIn 0.5s ease;
-        }
-
-        .chat-container {
-            display: grid;
-            grid-template-columns: 280px 1fr;
-            height: 100%;
-            background: var(--glass-bg);
-            backdrop-filter: blur(20px);
-            border-radius: 25px;
-            border: 1px solid var(--border-color);
-            overflow: hidden;
-        }
-
-        /* Sidebar (Kullanıcılar) */
-        .sidebar {
-            background: rgba(0,0,0,0.3);
-            border-right: 1px solid var(--border-color);
-            display: flex;
-            flex-direction: column;
-        }
-
-        .sidebar-header {
-            padding: 25px;
-            font-weight: 600;
-            border-bottom: 1px solid var(--border-color);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .user-list {
-            flex: 1;
-            overflow-y: auto;
-            padding: 20px;
-        }
-
-        .user-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 15px;
-            padding: 10px;
-            border-radius: 10px;
-            transition: 0.3s;
-        }
-
-        .user-item:hover { background: rgba(255,255,255,0.05); }
-
-        .avatar {
-            width: 35px;
-            height: 35px;
-            background: var(--primary-color);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-        }
+        /* Sidebar */
+        .sidebar { background: rgba(0,0,0,0.4); border-right: 1px solid rgba(255,255,255,0.05); display: flex; flex-direction: column; }
+        .sb-header { padding: 25px; border-bottom: 1px solid rgba(255,255,255,0.05); font-weight: 600; display: flex; align-items: center; gap: 10px; }
+        .user-list { flex: 1; padding: 20px; overflow-y: auto; }
+        .u-item { display: flex; align-items: center; gap: 12px; margin-bottom: 15px; font-size: 0.9rem; }
+        .u-avatar { width: 35px; height: 35px; background: var(--p); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; }
 
         /* Mesaj Alanı */
-        .chat-main {
-            display: flex;
-            flex-direction: column;
-        }
+        .main-chat { display: flex; flex-direction: column; }
+        #msg-history { flex: 1; padding: 25px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
+        .msg { max-width: 80%; padding: 12px 18px; border-radius: 18px; position: relative; line-height: 1.4; }
+        .msg.mine { align-self: flex-end; background: var(--p); border-bottom-right-radius: 4px; }
+        .msg.others { align-self: flex-start; background: rgba(255,255,255,0.1); border-bottom-left-radius: 4px; }
+        .msg-meta { font-size: 0.7rem; opacity: 0.6; margin-bottom: 4px; }
 
-        .chat-header {
-            padding: 20px 30px;
-            background: rgba(255,255,255,0.02);
-            border-bottom: 1px solid var(--border-color);
-            display: flex;
-            justify-content: space-between;
-        }
+        /* Input Alanı */
+        .input-bar { padding: 25px; background: rgba(0,0,0,0.3); display: flex; gap: 15px; }
+        .input-bar input { flex: 1; padding: 15px; background: #1a1a1a; border: 1px solid #333; border-radius: 12px; color: #fff; outline: none; }
+        .send-btn { width: 50px; height: 50px; background: var(--p); border: none; border-radius: 12px; color: #fff; cursor: pointer; }
 
-        #message-area {
-            flex: 1;
-            padding: 30px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .message {
-            max-width: 70%;
-            padding: 12px 18px;
-            border-radius: 18px;
-            position: relative;
-            background: rgba(255,255,255,0.05);
-            align-self: flex-start;
-        }
-
-        .message.mine {
-            background: var(--primary-color);
-            align-self: flex-end;
-            border-bottom-right-radius: 4px;
-        }
-
-        .message.others {
-            background: rgba(255,255,255,0.1);
-            border-bottom-left-radius: 4px;
-        }
-
-        .msg-info {
-            font-size: 0.75rem;
-            margin-bottom: 5px;
-            opacity: 0.7;
-        }
-
-        .chat-input-area {
-            padding: 25px 30px;
-            background: rgba(0,0,0,0.2);
-            display: flex;
-            gap: 15px;
-        }
-
-        .chat-input-area input {
-            flex: 1;
-            padding: 15px 20px;
-            background: rgba(255,255,255,0.05);
-            border: 1px solid var(--border-color);
-            border-radius: 15px;
-            color: white;
-            outline: none;
-        }
-
-        .btn-send {
-            width: 50px;
-            height: 50px;
-            border-radius: 15px;
-            background: var(--primary-color);
-            border: none;
-            color: white;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Scrollbar */
-        ::-webkit-scrollbar { width: 5px; }
-        ::-webkit-scrollbar-track { background: transparent; }
+        /* Kaydırma Çubuğu */
+        ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
     </style>
 </head>
 <body>
 
-<div class="video-bg"></div>
+<div class="bg-overlay"></div>
 
-<section id="login-screen">
-    <div class="login-card">
-        <h1>GOBAK CHAT</h1>
-        <p style="margin-bottom: 30px; opacity: 0.6;">Devam etmek için bir takma ad belirle</p>
-        <div class="input-group">
-            <input type="text" id="username" placeholder="Kullanıcı adın..." autocomplete="off">
-        </div>
-        <button class="btn-join" onclick="joinChat()">GİRİŞ YAP</button>
-        <p style="margin-top: 20px; font-size: 0.8rem; opacity: 0.4;">By: ömerbabapiromax</p>
+<section id="login-view">
+    <div class="login-box">
+        <h1>GOBAK</h1>
+        <p style="opacity:0.5">Mega Chat'e Giriş Yap</p>
+        <input type="text" id="uname" placeholder="Takma adın..." maxlength="15">
+        <button class="login-btn" onclick="startChat()">BAĞLAN</button>
+        <p style="margin-top:20px; font-size:0.7rem; opacity:0.3">Powered by ömerbabapiromax</p>
     </div>
 </section>
 
-<section id="chat-screen">
-    <div class="chat-container">
+<section id="chat-view">
+    <div class="chat-window">
         <aside class="sidebar">
-            <div class="sidebar-header">
-                <i class="fas fa-users" style="color: var(--primary-color);"></i>
-                <span>AKTİF ÜYELER</span>
-            </div>
-            <div class="user-list" id="userList">
-                </div>
+            <div class="sb-header"><i class="fas fa-circle" style="color:#00ff00; font-size:10px"></i> AKTİF KULLANICILAR</div>
+            <div class="user-list" id="uList"></div>
         </aside>
-
-        <main class="chat-main">
-            <div class="chat-header">
-                <div><i class="fas fa-hashtag" style="color: var(--primary-color);"></i> <strong>genel-sohbet</strong></div>
-                <div style="font-size: 0.8rem; opacity: 0.6;">Sunucu: TR-1</div>
-            </div>
-
-            <div id="message-area">
-                </div>
-
-            <div class="chat-input-area">
-                <input type="text" id="msgInput" placeholder="Mesajını buraya yaz..." onkeypress="handleEnter(event)">
-                <button class="btn-send" onclick="sendMessage()">
-                    <i class="fas fa-paper-plane"></i>
-                </button>
+        <main class="main-chat">
+            <div id="msg-history"></div>
+            <div class="input-bar">
+                <input type="text" id="mInput" placeholder="Mesajını buraya bırak..." onkeypress="if(event.key==='Enter') send()">
+                <button class="send-btn" onclick="send()"><i class="fas fa-paper-plane"></i></button>
             </div>
         </main>
     </div>
@@ -306,81 +104,58 @@
 <script src="/socket.io/socket.io.js"></script>
 <script>
     const socket = io();
-    let myUsername = "";
+    let myName = "";
 
-    function joinChat() {
-        const userInp = document.getElementById('username');
-        myUsername = userInp.value.trim();
-
-        if (myUsername.length < 2) {
-            alert("Lütfen geçerli bir isim gir!");
-            return;
-        }
-
-        document.getElementById('login-screen').style.opacity = '0';
-        setTimeout(() => {
-            document.getElementById('login-screen').style.display = 'none';
-            document.getElementById('chat-screen').style.display = 'block';
-            socket.emit('join', myUsername);
-        }, 500);
+    function startChat() {
+        const input = document.getElementById('uname');
+        myName = input.value.trim();
+        if(myName.length < 2) return alert("İsim çok kısa!");
+        
+        document.getElementById('login-view').style.display = 'none';
+        document.getElementById('chat-view').style.display = 'block';
+        
+        socket.emit('join', myName);
     }
 
-    function handleEnter(e) {
-        if (e.key === 'Enter') sendMessage();
-    }
-
-    function sendMessage() {
-        const inp = document.getElementById('msgInput');
-        const text = inp.value.trim();
-
-        if (text) {
-            socket.emit('newMessage', text);
+    function send() {
+        const inp = document.getElementById('mInput');
+        if(inp.value.trim()) {
+            socket.emit('sendMessage', inp.value);
             inp.value = '';
         }
     }
 
-    // Mesaj Geldiğinde
-    socket.on('message', data => {
-        const area = document.getElementById('message-area');
-        const isMine = data.user === myUsername;
-
-        const msgDiv = document.createElement('div');
-        msgDiv.className = `message ${isMine ? 'mine' : 'others'}`;
-        
-        msgDiv.innerHTML = `
-            <div class="msg-info">${data.user} • ${data.time}</div>
-            <div class="msg-text">${data.text}</div>
-        `;
-
-        area.appendChild(msgDiv);
-        area.scrollTop = area.scrollHeight;
+    socket.on('newIncomingMessage', data => {
+        renderMessage(data);
     });
 
-    // Eski Mesajları Yükle
-    socket.on('previousMessages', msgs => {
-        msgs.forEach(data => {
-            // Yukarıdaki mantığın aynısı
-            const area = document.getElementById('message-area');
-            const isMine = data.user === myUsername;
-            const msgDiv = document.createElement('div');
-            msgDiv.className = `message ${isMine ? 'mine' : 'others'}`;
-            msgDiv.innerHTML = `<div class="msg-info">${data.user} • ${data.time}</div><div>${data.text}</div>`;
-            area.appendChild(msgDiv);
-        });
-        const area = document.getElementById('message-area');
-        area.scrollTop = area.scrollHeight;
+    socket.on('loadMessages', msgs => {
+        document.getElementById('msg-history').innerHTML = '';
+        msgs.forEach(m => renderMessage(m));
     });
 
-    // Kullanıcı Listesi Güncelle
     socket.on('updateUserList', users => {
-        const list = document.getElementById('userList');
+        const list = document.getElementById('uList');
         list.innerHTML = users.map(u => `
-            <div class="user-item">
-                <div class="avatar">${u.charAt(0).toUpperCase()}</div>
+            <div class="u-item">
+                <div class="u-avatar">${u[0].toUpperCase()}</div>
                 <span>${u}</span>
             </div>
         `).join('');
     });
+
+    function renderMessage(data) {
+        const container = document.getElementById('msg-history');
+        const isMe = data.user === myName;
+        const div = document.createElement('div');
+        div.className = `msg ${isMe ? 'mine' : 'others'}`;
+        div.innerHTML = `
+            <div class="msg-meta">${data.user} • ${data.time}</div>
+            <div class="msg-text">${data.text}</div>
+        `;
+        container.appendChild(div);
+        container.scrollTop = container.scrollHeight;
+    }
 </script>
 
 </body>
