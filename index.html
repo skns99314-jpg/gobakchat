@@ -3,74 +3,65 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GOBALAK BABA NO1 - SQUAD</title>
+    <title>GUBALAK DOMINATION</title>
     <style>
         body {
             background-color: #000;
-            color: #00ff00;
+            color: #00ff00; /* Hacker yeşili */
             font-family: 'Courier New', Courier, monospace;
             margin: 0;
-            padding: 10px;
+            padding: 20px;
             overflow-x: hidden;
-            line-height: 1.1;
+            word-wrap: break-word;
+            line-height: 1.2;
         }
 
         #flood-container {
-            font-size: 16px; /* İlk baştaki ideal boyut */
+            font-size: 14px;
             font-weight: bold;
+            text-shadow: 0 0 5px #00ff00;
         }
 
-        .line {
-            white-space: nowrap;
-            border-bottom: 1px solid #111;
-            padding: 2px 0;
+        .count-marker {
+            color: #fe2c55; /* TikTok kırmızısı vurgu */
+            margin-right: 10px;
         }
-
-        .marker {
-            color: #fe2c55;
-            margin-right: 8px;
-        }
-
-        #stats {
-            position: fixed;
-            top: 10px;
-            right: 10px;
-            background: #d4af37;
-            color: #000;
-            padding: 8px 15px;
-            font-weight: bold;
-            z-index: 1000;
-            border: 2px solid #fff;
-        }
-    </style>
-</head>
-<body>
-
-<div id="stats">MESAJ: <span id="total">0</span></div>
-<div id="flood-container"></div>
 
 <script>
     let counter = 1;
     const container = document.getElementById('flood-container');
     const totalDisplay = document.getElementById('total');
 
-    // Saniyede 500 mesaj (1000 / 500 = 2ms)
-    // Karışmaması için her döngüde kontrollü ekleme yapar.
+    // Saniyede 40 kere yazdırma ayarı (1000ms / 40 = 25ms)
     const floodSpeed = 2; 
 
-    function startPrecisionFlood() {
+    function startFlooding() {
         setInterval(() => {
-            // Saniyede 500'ü yakalamak için her 2ms'de 1 mesaj
+            // Yeni mesajı oluştur
             const msg = document.createElement('div');
-            msg.className = 'line';
-            msg.innerHTML = `<span class="marker">[NO1]</span> GOBALAK BABA NO1 - ${counter}`;
+            msg.innerHTML = `<span class="count-marker">[#${counter}]</span> GOBAK BABA NO 1 - https://gobakchat.xyz - ${counter}`;
             
+            // Konteynıra ekle
             container.appendChild(msg);
+            
+            // İstatistikleri güncelle
             totalDisplay.innerText = counter;
             counter++;
 
-            // Aşağı kaydır
+            // Ekranı otomatik aşağı kaydır
             window.scrollTo(0, document.body.scrollHeight);
 
-            // Performans ve karışıklığı önleme: 1000 mesajda bir temizlik
-            if (counter % 1000 === 0) {
+            // Tarayıcıyı kasmaması için çok aşırı (mesela 50000) mesajdan sonra temizlik yapabilirsin 
+            // ama "sonsuza dek" dediğin için dokunmuyorum.
+        }, floodSpeed);
+    }
+
+    // Siteye girince direkt başlar
+    window.onload = () => {
+        console.log("Gubalak sistemi tetiklendi. Hız: 40 msg/sec");
+        startFlooding();
+    };
+</script>
+
+</body>
+</html>
