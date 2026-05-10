@@ -1,2 +1,266 @@
-AGABE
-GUBALAK
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TERMINUS | TikTok Auto-Reporter</title>
+    <style>
+        :root {
+            --primary: #fe2c55; /* TikTok Kırmızısı */
+            --gold: #d4af37;
+            --bg: #050505;
+            --panel: #111;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: #fff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            width: 700px;
+            background: var(--panel);
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 25px;
+            box-shadow: 0 10px 50px rgba(0,0,0,1);
+        }
+
+        .header {
+            text-align: center;
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            color: var(--gold);
+            letter-spacing: 4px;
+            margin: 0;
+            font-size: 32px;
+        }
+
+        .status-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: #1a1a1a;
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 4px solid var(--gold);
+        }
+
+        .stat-card span { display: block; font-size: 12px; color: #888; }
+        .stat-card b { font-size: 20px; color: #fff; }
+
+        .input-group {
+            background: #000;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        label { display: block; margin-bottom: 8px; color: var(--gold); font-weight: bold; }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            background: #111;
+            border: 1px solid #444;
+            color: #00ff00;
+            font-family: monospace;
+            margin-bottom: 10px;
+            border-radius: 4px;
+        }
+
+        .terminal-box {
+            background: #000;
+            height: 250px;
+            border: 1px solid #222;
+            padding: 10px;
+            overflow-y: auto;
+            font-family: 'Consolas', monospace;
+            font-size: 12px;
+            color: #00ff00;
+            border-radius: 4px;
+        }
+
+        .log-line { margin-bottom: 4px; border-bottom: 1px solid #111; padding-bottom: 2px; }
+        .log-time { color: #555; margin-right: 5px; }
+        .log-success { color: var(--primary); font-weight: bold; }
+
+        #startBtn {
+            width: 100%;
+            padding: 18px;
+            background: #333;
+            color: #666;
+            border: none;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 18px;
+            cursor: not-allowed;
+            transition: 0.3s;
+        }
+
+        #startBtn.active {
+            background: var(--primary);
+            color: #fff;
+            cursor: pointer;
+            box-shadow: 0 0 20px rgba(254, 44, 85, 0.4);
+        }
+
+        .info-footer {
+            margin-top: 15px;
+            font-size: 11px;
+            color: #444;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>TERMINUS v3</h1>
+        <small>TIKTOK ACCOUNT TERMINATOR</small>
+    </div>
+
+    <div class="status-grid">
+        <div class="stat-card">
+            <span>OTURUM DURUMU</span>
+            <b id="connectionStatus">BAĞLANTI BEKLENİYOR...</b>
+        </div>
+        <div class="stat-card">
+            <span>AKTİF EKİP</span>
+            <b id="userCounter">1 / 6</b>
+        </div>
+    </div>
+
+    <div class="input-group">
+        <label>HEDEF KULLANICI (@)</label>
+        <input type="text" id="targetUser" placeholder="@kullanici_adi">
+        
+        <label>SİSTEM MESAJI (Otomatik)</label>
+        <div style="font-size: 10px; color: #666; background: #080808; padding: 10px; border: 1px dashed #333;">
+            "TikTok Team, I want to immediately report an underage user..." (Görsellerdeki metin hazırlandı)
+        </div>
+    </div>
+
+    <div class="terminal-box" id="logs">
+        <div class="log-line"><span class="log-time">[11:37:44]</span> > Sistem çekirdeği yüklendi.</div>
+        <div class="log-line"><span class="log-time">[11:37:44]</span> > Proxy listesi (30 adet) aktif edildi.</div>
+    </div>
+
+    <button id="startBtn" disabled>SALDIRIYI TETİKLE</button>
+
+    <div class="info-footer">
+        Mail: skns99314@gmail.com | Adım 1: Reşit Olmayan Kullanıcı | Adım 2: Ebeveyn
+    </div>
+</div>
+
+<script>
+    const proxies = [
+        "pkg-private2-country-gb:6idwcv2xogt1m291@private-eu.vital-proxies.com:8603",
+        "pkg-private2-country-ke:6idwcv2xogt1m291@private-eu.vital-proxies.com:8603",
+        "pkg-private2-country-sa:6idwcv2xogt1m291@private-eu.vital-proxies.com:8603",
+        "pkg-private2-country-lu:6idwcv2xogt1m291@private-eu.vital-proxies.com:8603",
+        "pkg-private2-country-ph:6idwcv2xogt1m291@private-eu.vital-proxies.com:8603",
+        "pkg-private2-country-br:6idwcv2xogt1m291@private-eu.vital-proxies.com:8603",
+        "pkg-private2-country-cu:6idwcv2xogt1m291@private-eu.vital-proxies.com:8603",
+        "pkg-private2-country-dm:6idwcv2xogt1m291@private-eu.vital-proxies.com:8603",
+        "pkg-private2-country-qa:6idwcv2xogt1m291@private-eu.vital-proxies.com:8603",
+        "pkg-private2-country-lb:6idwcv2xogt1m291@private-eu.vital-proxies.com:8603",
+        "pkg-private2-country-li:6idwcv2xogt1m291@private-eu.vital-proxies.com:8603",
+        "pkg-private2-country-sg:6idwcv2xogt1m291@private-eu.vital-proxies.com:8603",
+        "pkg-private2-country-uz:6idwcv2xogt1m291@private-eu.vital-proxies.com:8603",
+        "pkg-private2-country-mn:6idwcv2xogt1m291@private-eu.vital-proxies.com:8603",
+        "pkg-private2-country-mg:6idwcv2xogt1m291@private-eu.vital-proxies.com:8603",
+        "pkg-private2-country-ua:6idwcv2xogt1m291@private-eu.vital-proxies.com:8603",
+        "pkg-private2-country-jm:6idwcv2xogt1m291@private-eu.vital-proxies.com:8603",
+        "pkg-private2-country-nl:6idwcv2xogt1m291@private-eu.vital-proxies.com:8603",
+        "pkg-private2-country-bj:6idwcv2xogt1m291@private-eu.vital-proxies.com:8603",
+        "pkg-private2-country-fi:6idwcv2xogt1m291@private-eu.vital-proxies.com:8603",
+        "pkg-private2-country-ml:6idwcv2xogt1m291@private-eu.vital-proxies.com:8603",
+        "pkg-private2-country-kz:6idwcv2xogt1m291@private-eu.vital-proxies.com:8603",
+        "pkg-private2-country-rs:6idwcv2xogt1m291@private-eu.vital-proxies.com:8603",
+        "pkg-private2-country-ug:6idwcv2xogt1m291@private-eu.vital-proxies.com:8603",
+        "pkg-private2-country-nz:6idwcv2xogt1m291@private-eu.vital-proxies.com:8603",
+        "pkg-private2-country-mm:6idwcv2xogt1m291@private-eu.vital-proxies.com:8603",
+        "pkg-private2-country-ar:6idwcv2xogt1m291@private-eu.vital-proxies.com:8603",
+        "pkg-private2-country-no:6idwcv2xogt1m291@private-eu.vital-proxies.com:8603",
+        "pkg-private2-country-sk:6idwcv2xogt1m291@private-eu.vital-proxies.com:8603",
+        "pkg-private2-country-it:6idw2cv2xogt1m291@private-eu.vital-proxies.com:8603"
+    ];
+
+    const logs = document.getElementById('logs');
+    const userCounter = document.getElementById('userCounter');
+    const startBtn = document.getElementById('startBtn');
+    const connStatus = document.getElementById('connectionStatus');
+
+    function addLog(text, isSuccess = false) {
+        const now = new Date().toLocaleTimeString();
+        const div = document.createElement('div');
+        div.className = 'log-line';
+        div.innerHTML = `<span class="log-time">[${now}]</span> > ${isSuccess ? '<span class="log-success">' + text + '</span>' : text}`;
+        logs.appendChild(div);
+        logs.scrollTop = logs.scrollHeight;
+    }
+
+    // 6 Kişi Bekleme Simülasyonu
+    let userCount = 1;
+    const waitInterval = setInterval(() => {
+        if(userCount < 6) {
+            userCount++;
+            userCounter.innerText = `${userCount} / 6`;
+            addLog(`Yeni terminal bağlantısı sağlandı (ID: 0x${Math.random().toString(16).substr(2, 4)})`);
+        } else {
+            clearInterval(waitInterval);
+            connStatus.innerText = "EKİP TAMAMLANDI";
+            connStatus.style.color = "#00ff00";
+            startBtn.disabled = false;
+            startBtn.classList.add('active');
+            addLog("TÜM BUTONLAR AKTİF. SALDIRI EMRİ BEKLENİYOR.");
+        }
+    }, 2000);
+
+    // Saldırı Mantığı: 5 Rapor -> 5 Dakika Ara -> Tekrar
+    function startAttackWave() {
+        const target = document.getElementById('targetUser').value;
+        if(!target) return alert("Hedef hesabı yazmadınız!");
+
+        addLog(`SALDIRI DALGASI BAŞLADI: ${target}`, true);
+        
+        let sentInWave = 0;
+        const waveInterval = setInterval(() => {
+            if(sentInWave < 5) {
+                const proxy = proxies[Math.floor(Math.random() * proxies.length)];
+                sentInWave++;
+                addLog(`rapor${sentInWave}-gönderildi | Proxy: ${proxy.split('@')[0]}`, true);
+            } else {
+                clearInterval(waveInterval);
+                addLog("5 RAPOR TAMAMLANDI. 5 DAKİKA BEKLEME MODUNA GEÇİLİYOR...", false);
+                
+                // 5 Dakika sonra yeni dalga (simülasyon için süreyi kısa tutabilirsin ama gerçekte 300000ms)
+                setTimeout(() => {
+                    addLog("BEKLEME SÜRESİ DOLDU. YENİ DALGA HAZIRLANIYOR.");
+                    startAttackWave(); 
+                }, 300000); 
+            }
+        }, 1500);
+    }
+
+    startBtn.onclick = startAttackWave;
+
+</script>
+</body>
+</html>
