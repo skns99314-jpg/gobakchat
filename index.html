@@ -3,115 +3,110 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GUBALAK DOMINATION - NO LIMIT</title>
+    <title>Sistem Terminali</title>
     <style>
-        body, html {
+        /* Temel sıfırlamalar ve siyah arka plan */
+        body {
             margin: 0;
             padding: 0;
             background-color: #000;
-            /* Kaydırma çubuğunu gizle ama kaydırmaya izin ver */
-            scrollbar-width: none; 
-        }
-        body::-webkit-scrollbar {
-            display: none;
-        }
-
-        #matrix-bg {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1;
-        }
-
-        #flood-container {
-            position: absolute;
-            top: 0;
-            left: 10px;
-            width: calc(100% - 20px);
-            z-index: 2;
+            overflow: hidden; /* Kaydırma çubuklarını gizler */
             font-family: 'Courier New', Courier, monospace;
-            font-size: 13px;
-            font-weight: bold;
-            color: #00ff00;
-            text-shadow: 0 0 5px #00ff00;
-            line-height: 1.1;
-            padding-bottom: 50px; /* Altta boşluk bırak */
+        }
+        
+        canvas {
+            display: block; /* Canvas etrafındaki varsayılan boşluğu kaldırır */
         }
 
-        .count-marker {
-            color: #fe2c55;
-            margin-right: 5px;
+        /* Arka planın üzerine eklenecek içerik için örnek bir katman */
+        .merkez-icerik {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #0f0;
+            text-align: center;
+            text-shadow: 0 0 15px #0f0, 0 0 30px #0f0; /* Neon parlama efekti */
+            pointer-events: none; /* Fare tıklamalarının altındaki canvas'a geçmesine izin verir */
+            z-index: 10;
         }
     </style>
 </head>
 <body>
 
-<canvas id="matrix-bg"></canvas>
-<div id="flood-container"></div>
+    <!-- Üzerine yazacağın içerik -->
+    <div class="merkez-icerik">
+        <h1>SİSTEME ERİŞİM SAĞLANDI</h1>
+        <p>Bağlantı şifrelendi...</p>
+    </div>
 
-<script>
-    // --- MATRIX ARKA PLAN ---
-    const canvas = document.getElementById('matrix-bg');
-    const ctx = canvas.getContext('2d');
+    <!-- Matrix animasyonunun oynayacağı tuval -->
+    <canvas id="matrixArkaplan"></canvas>
 
-    function resizeCanvas() {
+    <script>
+        const canvas = document.getElementById('matrixArkaplan');
+        const ctx = canvas.getContext('2d');
+
+        // Canvas boyutlarını tam ekran yap
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
-    }
-    resizeCanvas();
-    window.addEventListener('resize', resizeCanvas);
 
-    const characters = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿ';
-    const fontSize = 16;
-    const columns = canvas.width / fontSize;
-    const drops = Array(Math.floor(columns)).fill(1);
+        // Orijinal Matrix filmindeki gibi Japonca Katakana karakterleri, Latin harfleri ve rakamlar
+        const karakterler = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()_+ｦｧｨｩｪｫｬｭｮｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓﾔﾕﾖﾗﾘﾙﾚﾛﾜﾝ';
+        const karakterDizisi = karakterler.split('');
 
-    function drawMatrix() {
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.fillStyle = '#0F0';
-        ctx.font = fontSize + 'px monospace';
+        const fontBoyutu = 16;
+        const sutunlar = canvas.width / fontBoyutu; // Ekran genişliğine göre sütun sayısı hesaplama
 
-        for (let i = 0; i < drops.length; i++) {
-            const text = characters.charAt(Math.floor(Math.random() * characters.length));
-            ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-            if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
-            drops[i]++;
+        // Her sütun için düşen damlaların Y koordinatını tutan dizi
+        const damlalar = [];
+        for (let i = 0; i < sutunlar; i++) {
+            damlalar[i] = 1;
         }
-    }
 
-    // --- SINIRSIZ MESAJ AKIŞI ---
-    let counter = 1;
-    const container = document.getElementById('flood-container');
-    const batchSize = 10; 
-    const floodSpeed = 20; // Saniyede toplam 500 mesaj (50 x 10)
+        function matrixCiz() {
+            // Siyah arka planı hafif saydam çizerek eski karakterlerin yavaşça silinmesini (kuyruk efekti) sağla
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    function startFlooding() {
-        setInterval(() => {
-            let fragment = document.createDocumentFragment();
-            
-            for(let i = 0; i < batchSize; i++) {
-                const msg = document.createElement('div');
-                msg.innerHTML = `<span class="count-marker">[#${counter}]</span> GUBALAK BABADIR - ${counter}`;
-                fragment.appendChild(msg);
-                counter++;
+            // Gelişmiş "Glow" (Parlama) efekti ayarları
+            ctx.shadowBlur = 3;
+            ctx.shadowColor = '#0F0';
+            ctx.fillStyle = '#0F0'; // Parlak Matrix yeşili
+            ctx.font = fontBoyutu + 'px monospace';
+
+            for (let i = 0; i < damlalar.length; i++) {
+                // Rastgele bir karakter seç
+                const rastgeleKarakter = karakterDizisi[Math.floor(Math.random() * karakterDizisi.length)];
+                
+                // Karakteri ekrana yazdır (X koordinatı: sütun sırası, Y koordinatı: damla seviyesi)
+                ctx.fillText(rastgeleKarakter, i * fontBoyutu, damlalar[i] * fontBoyutu);
+
+                // Damla ekranın en altına ulaştıysa ve rastgele bir ihtimal gerçekleşirse damlayı en başa sar
+                // Math.random() > 0.975 ile damlaların farklı zamanlarda başa dönmesini sağlıyoruz
+                if (damlalar[i] * fontBoyutu > canvas.height && Math.random() > 0.975) {
+                    damlalar[i] = 0;
+                }
+
+                // Damlayı bir birim aşağı kaydır
+                damlalar[i]++;
             }
+        }
 
-            container.appendChild(fragment);
+        // Animasyonu saniyede ~30 kare (33 milisaniye) hızında çalıştır
+        setInterval(matrixCiz, 33);
 
-            // SİLME İŞLEMİ KALDIRILDI - Sayfayı en aşağı kaydırır
-            window.scrollTo(0, document.body.scrollHeight);
-
-        }, floodSpeed);
-    }
-
-    window.onload = () => {
-        setInterval(drawMatrix, 33);
-        startFlooding();
-    };
-</script>
-
+        // Tarayıcı penceresi yeniden boyutlandırıldığında canvas'ı uyarla
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            
+            // Sütun sayısını yeniden hesapla ve yeni sütunlar eklendiyse onlara da damla ata
+            const yeniSutunlar = canvas.width / fontBoyutu;
+            for (let i = damlalar.length; i < yeniSutunlar; i++) {
+                damlalar[i] = 1;
+            }
+        });
+    </script>
 </body>
 </html>
