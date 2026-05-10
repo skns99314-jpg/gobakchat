@@ -3,48 +3,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GUBALAK DOMINATION</title>
+    <title>GOBALAK MAXIMUM VELOCITY</title>
     <style>
         body {
             background-color: #000;
-            color: #00ff00; /* Hacker yeşili */
-            font-family: 'Courier New', Courier, monospace;
             margin: 0;
-            padding: 20px;
+            padding: 0;
             overflow-x: hidden;
-            word-wrap: break-word;
-            line-height: 1.2;
+            background: radial-gradient(circle, #1a1a1a 0%, #000 100%);
         }
 
         #flood-container {
-            font-size: 14px;
-            font-weight: bold;
-            text-shadow: 0 0 5px #00ff00;
+            display: flex;
+            flex-direction: column;
+            padding: 10px;
         }
 
-        .count-marker {
-            color: #fe2c55; /* TikTok kırmızısı vurgu */
-            margin-right: 10px;
+        .flood-msg {
+            font-family: 'Arial Black', sans-serif;
+            font-size: 42px; /* Dev Puntolar */
+            font-weight: 900;
+            text-transform: uppercase;
+            line-height: 1;
+            margin: 2px 0;
+            white-space: nowrap;
+            /* Renk geçişli ve parlayan yazı */
+            background: linear-gradient(90deg, #fe2c55, #d4af37, #fe2c55);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 10px rgba(254, 44, 85, 0.5);
+            animation: pulse 0.1s infinite;
         }
 
-        /* En üste sabitlenmiş sayaç */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+
         #stats {
             position: fixed;
-            top: 10px;
-            right: 10px;
-            background: rgba(212, 175, 55, 0.9);
-            color: #000;
-            padding: 10px;
+            top: 20px;
+            left: 20px;
+            background: #fe2c55;
+            color: #fff;
+            padding: 15px 30px;
+            font-size: 24px;
+            font-family: sans-serif;
             font-weight: bold;
-            border-radius: 5px;
-            z-index: 1000;
-            box-shadow: 0 0 20px #d4af37;
+            border-radius: 50px;
+            z-index: 9999;
+            box-shadow: 0 0 30px #fe2c55;
         }
     </style>
 </head>
 <body>
 
-<div id="stats">TOPLAM MESAJ: <span id="total">0</span></div>
+<div id="stats">MESAJ: <span id="total">0</span></div>
 <div id="flood-container"></div>
 
 <script>
@@ -52,34 +67,37 @@
     const container = document.getElementById('flood-container');
     const totalDisplay = document.getElementById('total');
 
-    // Saniyede 40 kere yazdırma ayarı (1000ms / 40 = 25ms)
-    const floodSpeed = 25; 
+    // Saniyede 800 mesaj için gecikme (1000ms / 800 = 1.25ms)
+    // Tarayıcı limitleri nedeniyle 1ms'ye çekildi (Maksimum hız)
+    const floodSpeed = 1; 
 
-    function startFlooding() {
+    function startHyperFlood() {
+        // Performans için her döngüde birden fazla mesaj ekleyerek hızı katlıyoruz
         setInterval(() => {
-            // Yeni mesajı oluştur
-            const msg = document.createElement('div');
-            msg.innerHTML = `<span class="count-marker">[#${counter}]</span> GUBALAK BABADIR - ${counter}`;
+            for(let i = 0; i < 5; i++) { // Her vuruşta 5 mesaj (800'ü garantilemek için)
+                const msg = document.createElement('div');
+                msg.className = 'flood-msg';
+                msg.innerText = `GOBALAK BABA NO1 - ${counter}`;
+                container.appendChild(msg);
+                counter++;
+            }
             
-            // Konteynıra ekle
-            container.appendChild(msg);
-            
-            // İstatistikleri güncelle
-            totalDisplay.innerText = counter;
-            counter++;
+            totalDisplay.innerText = counter.toLocaleString();
 
-            // Ekranı otomatik aşağı kaydır
+            // Otomatik kaydırma
             window.scrollTo(0, document.body.scrollHeight);
 
-            // Tarayıcıyı kasmaması için çok aşırı (mesela 50000) mesajdan sonra temizlik yapabilirsin 
-            // ama "sonsuza dek" dediğin için dokunmuyorum.
+            // RAM yönetimi: Sayfa çok ağırlaşırsa eski mesajları temizle
+            if (counter % 2000 === 0) {
+                while (container.childNodes.length > 500) {
+                    container.removeChild(container.firstChild);
+                }
+            }
         }, floodSpeed);
     }
 
-    // Siteye girince direkt başlar
     window.onload = () => {
-        console.log("Gubalak sistemi tetiklendi. Hız: 40 msg/sec");
-        startFlooding();
+        startHyperFlood();
     };
 </script>
 
