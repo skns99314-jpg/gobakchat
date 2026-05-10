@@ -10,75 +10,65 @@
             color: #00ff00; /* Hacker yeşili */
             font-family: 'Courier New', Courier, monospace;
             margin: 0;
-            padding: 20px;
+            padding: 10px;
             overflow-x: hidden;
             word-wrap: break-word;
-            line-height: 1.2;
+            line-height: 1.1;
         }
 
         #flood-container {
-            font-size: 14px;
+            font-size: 12px;
             font-weight: bold;
-            text-shadow: 0 0 5px #00ff00;
+            text-shadow: 0 0 3px #00ff00;
         }
 
         .count-marker {
             color: #fe2c55; /* TikTok kırmızısı vurgu */
-            margin-right: 10px;
-        }
-
-        /* En üste sabitlenmiş sayaç */
-        #stats {
-            position: fixed;
-            top: 10px;
-            right: 10px;
-            background: rgba(212, 175, 55, 0.9);
-            color: #000;
-            padding: 10px;
-            font-weight: bold;
-            border-radius: 5px;
-            z-index: 1000;
-            box-shadow: 0 0 20px #d4af37;
+            margin-right: 5px;
         }
     </style>
 </head>
 <body>
 
-<div id="stats">TOPLAM MESAJ: <span id="total">0</span></div>
 <div id="flood-container"></div>
 
 <script>
     let counter = 1;
     const container = document.getElementById('flood-container');
-    const totalDisplay = document.getElementById('total');
 
-    // Saniyede 40 kere yazdırma ayarı (1000ms / 40 = 25ms)
-    const floodSpeed = 25; 
+    // Saniyede 500 mesaj için gecikme yaklaşık 2ms
+    // Ancak tarayıcı her 2ms'de bir ekrana çizim yapamaz.
+    // Bu yüzden performansı artırmak için her döngüde 10'arlı mesaj basıyoruz.
+    const batchSize = 10; 
+    const floodSpeed = 20; // 1000ms / (500/10) = 20ms
 
     function startFlooding() {
         setInterval(() => {
-            // Yeni mesajı oluştur
-            const msg = document.createElement('div');
-            msg.innerHTML = `<span class="count-marker">[#${counter}]</span> GUBALAK BABADIR - ${counter}`;
+            let fragment = document.createDocumentFragment();
             
-            // Konteynıra ekle
-            container.appendChild(msg);
-            
-            // İstatistikleri güncelle
-            totalDisplay.innerText = counter;
-            counter++;
+            for(let i = 0; i < batchSize; i++) {
+                const msg = document.createElement('div');
+                msg.innerHTML = `<span class="count-marker">[#${counter}]</span> GOBAK BABA NO1 - ${counter}`;
+                fragment.appendChild(msg);
+                counter++;
+            }
 
-            // Ekranı otomatik aşağı kaydır
+            container.appendChild(fragment);
+
+            // Ekranı en aşağı kaydır
             window.scrollTo(0, document.body.scrollHeight);
 
-            // Tarayıcıyı kasmaması için çok aşırı (mesela 50000) mesajdan sonra temizlik yapabilirsin 
-            // ama "sonsuza dek" dediğin için dokunmuyorum.
+            // RAM yönetimi: Tarayıcının çökmesini önlemek için 20.000 satırdan sonrasını temizle
+            if (container.children.length > 2000000) {
+                for (let i = 0; i < batchSize; i++) {
+                    container.removeChild(container.firstChild);
+                }
+            }
         }, floodSpeed);
     }
 
-    // Siteye girince direkt başlar
     window.onload = () => {
-        console.log("Gubalak sistemi tetiklendi. Hız: 40 msg/sec");
+        console.log("Gubalak Ultra Speed Mode: Active");
         startFlooding();
     };
 </script>
