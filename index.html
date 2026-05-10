@@ -3,108 +3,144 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Terminali</title>
+    <title>Terminal</title>
     <style>
-        /* Temel sıfırlamalar ve siyah arka plan */
         body {
             margin: 0;
             padding: 0;
-            background-color: #000;
-            overflow: hidden; /* Kaydırma çubuklarını gizler */
-            font-family: 'Courier New', Courier, monospace;
-        }
-        
-        canvas {
-            display: block; /* Canvas etrafındaki varsayılan boşluğu kaldırır */
+            background-color: #020202; /* Tam siyah yerine çok koyu bir gri/yeşil alt tonu */
+            overflow: hidden;
         }
 
-        /* Arka planın üzerine eklenecek içerik için örnek bir katman */
-        .merkez-icerik {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: #0f0;
-            text-align: center;
-            text-shadow: 0 0 15px #0f0, 0 0 30px #0f0; /* Neon parlama efekti */
-            pointer-events: none; /* Fare tıklamalarının altındaki canvas'a geçmesine izin verir */
+        canvas {
+            display: block;
+        }
+
+        /* Eski tip Hacker CRT Monitör Efekti */
+        .crt-ekran {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            /* Tarama çizgileri (Scanlines) */
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
+                        linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background-size: 100% 4px, 3px 100%;
+            pointer-events: none; /* Farenin canvas ile etkileşime girmesine izin ver */
             z-index: 10;
+            /* Monitör köşelerindeki karanlık vinyet efekti */
+            box-shadow: inset 0 0 100px rgba(0, 200, 0, 0.15); 
         }
     </style>
 </head>
 <body>
 
-    <!-- Üzerine yazacağın içerik -->
-    <div class="merkez-icerik">
-        <h1>SİSTEME ERİŞİM SAĞLANDI</h1>
-        <p>Bağlantı şifrelendi...</p>
-    </div>
-
-    <!-- Matrix animasyonunun oynayacağı tuval -->
-    <canvas id="matrixArkaplan"></canvas>
+    <!-- Monitör efekti katmanı -->
+    <div class="crt-ekran"></div>
+    
+    <!-- Ana veri akışı -->
+    <canvas id="hackerArkaplan"></canvas>
 
     <script>
-        const canvas = document.getElementById('matrixArkaplan');
+        const canvas = document.getElementById('hackerArkaplan');
         const ctx = canvas.getContext('2d');
 
-        // Canvas boyutlarını tam ekran yap
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
 
-        // Orijinal Matrix filmindeki gibi Japonca Katakana karakterleri, Latin harfleri ve rakamlar
-        const karakterler = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()_+ｦｧｨｩｪｫｬｭｮｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓﾔﾕﾖﾗﾘﾙﾚﾛﾜﾝ';
+        // Binary, Hex kodları ve özel karakterlerin karışımı
+        const karakterler = '0101010101010101010101ABCDEF0123456789!@#$%>?/;';
         const karakterDizisi = karakterler.split('');
 
-        const fontBoyutu = 16;
-        const sutunlar = canvas.width / fontBoyutu; // Ekran genişliğine göre sütun sayısı hesaplama
+        const fontBoyutu = 14;
+        const sutunlar = canvas.width / fontBoyutu;
 
-        // Her sütun için düşen damlaların Y koordinatını tutan dizi
         const damlalar = [];
+        const hizlar = []; // Her veri sütununun kendi hızı olacak
+
+        // Başlangıç değerlerini ata
         for (let i = 0; i < sutunlar; i++) {
-            damlalar[i] = 1;
+            damlalar[i] = Math.random() * -100; // Ekrana girmeden önce rastgele bir yükseklikte başlasınlar
+            hizlar[i] = Math.random() * 0.7 + 0.3; // Standarttan farklı, rastgele hızlar
         }
 
-        function matrixCiz() {
-            // Siyah arka planı hafif saydam çizerek eski karakterlerin yavaşça silinmesini (kuyruk efekti) sağla
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+        // Fare etkileşimini dinle
+        let fareX = -100;
+        let fareY = -100;
+        window.addEventListener('mousemove', (e) => {
+            fareX = e.clientX;
+            fareY = e.clientY;
+        });
+        window.addEventListener('mouseout', () => {
+            fareX = -100;
+            fareY = -100;
+        });
+
+        function ekranCiz() {
+            // Eski izleri silerken koyu bir iz bırak (kuyruk efekti)
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.08)';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // Gelişmiş "Glow" (Parlama) efekti ayarları
-            ctx.shadowBlur = 3;
-            ctx.shadowColor = '#0F0';
-            ctx.fillStyle = '#0F0'; // Parlak Matrix yeşili
-            ctx.font = fontBoyutu + 'px monospace';
+            ctx.font = 'bold ' + fontBoyutu + 'px "Courier New", monospace';
 
             for (let i = 0; i < damlalar.length; i++) {
-                // Rastgele bir karakter seç
                 const rastgeleKarakter = karakterDizisi[Math.floor(Math.random() * karakterDizisi.length)];
                 
-                // Karakteri ekrana yazdır (X koordinatı: sütun sırası, Y koordinatı: damla seviyesi)
-                ctx.fillText(rastgeleKarakter, i * fontBoyutu, damlalar[i] * fontBoyutu);
+                const x = i * fontBoyutu;
+                const y = damlalar[i] * fontBoyutu;
 
-                // Damla ekranın en altına ulaştıysa ve rastgele bir ihtimal gerçekleşirse damlayı en başa sar
-                // Math.random() > 0.975 ile damlaların farklı zamanlarda başa dönmesini sağlıyoruz
-                if (damlalar[i] * fontBoyutu > canvas.height && Math.random() > 0.975) {
-                    damlalar[i] = 0;
+                // Farenin veriye olan uzaklığını ölç
+                const mesafeX = Math.abs(x - fareX);
+                const mesafeY = Math.abs(y - fareY);
+                
+                // Eğer fare yakınlardaysa veriyi "boz" (kırmızı glitch)
+                if (mesafeX < 60 && mesafeY < 60) {
+                    ctx.fillStyle = '#ff2a2a'; 
+                    ctx.shadowBlur = 15;
+                    ctx.shadowColor = '#ff2a2a';
+                } 
+                // Bazen rastgele bir kod deşifre ediliyormuş gibi anlık beyaz parlasın
+                else if (Math.random() > 0.985) {
+                    ctx.fillStyle = '#ffffff';
+                    ctx.shadowBlur = 10;
+                    ctx.shadowColor = '#ffffff';
+                } 
+                // Standart hacker yeşili
+                else {
+                    ctx.fillStyle = '#0fa'; // Hafif neon bir yeşil/cyan karışımı
+                    ctx.shadowBlur = 3;
+                    ctx.shadowColor = '#0fa';
                 }
 
-                // Damlayı bir birim aşağı kaydır
-                damlalar[i]++;
+                ctx.fillText(rastgeleKarakter, x, y);
+
+                // Veri ekranın altına indiğinde
+                if (y > canvas.height && Math.random() > 0.975) {
+                    damlalar[i] = 0; // Başa sar
+                    hizlar[i] = Math.random() * 0.7 + 0.3; // Hızını değiştir (dinamik akış)
+                }
+
+                // Kendi hızına göre aşağı düşmeye devam etsin
+                damlalar[i] += hizlar[i];
             }
+            
+            // Animasyonu en yüksek performansta (60FPS) çalıştır
+            requestAnimationFrame(ekranCiz);
         }
 
-        // Animasyonu saniyede ~30 kare (33 milisaniye) hızında çalıştır
-        setInterval(matrixCiz, 33);
+        // Sistemi başlat
+        ekranCiz();
 
-        // Tarayıcı penceresi yeniden boyutlandırıldığında canvas'ı uyarla
+        // Pencere boyutu değiştiğinde tepki ver
         window.addEventListener('resize', () => {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
             
-            // Sütun sayısını yeniden hesapla ve yeni sütunlar eklendiyse onlara da damla ata
             const yeniSutunlar = canvas.width / fontBoyutu;
             for (let i = damlalar.length; i < yeniSutunlar; i++) {
-                damlalar[i] = 1;
+                damlalar[i] = Math.random() * -100;
+                hizlar[i] = Math.random() * 0.7 + 0.3;
             }
         });
     </script>
