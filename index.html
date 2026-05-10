@@ -3,366 +3,335 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ECHO_OS | KERNEL_LEVEL_ACCESS</title>
+    <title>GOBAK_PHANTOM // NEURAL_LINK</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;500;700&family=Orbitron:wght@400;900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;500;700&family=Orbitron:wght@400;900&family=Rajdhani:wght@300;500;700&display=swap');
 
         :root {
             --neon-green: #00ff41;
-            --dark-green: #003b00;
-            --pure-black: #050505;
+            --neon-purple: #bc13fe;
+            --neon-blue: #00d2ff;
             --alert-red: #ff003c;
-            --cyber-blue: #00d2ff;
-            --glass-bg: rgba(0, 20, 0, 0.9);
-            --crt-overlay: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            --bg-black: #020202;
+            --glass: rgba(0, 20, 0, 0.7);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; cursor: crosshair; }
+        * { margin: 0; padding: 0; box-sizing: border-box; cursor: crosshair; outline: none; }
 
         body {
-            background-color: var(--pure-black);
+            background-color: var(--bg-black);
             color: var(--neon-green);
             font-family: 'Fira Code', monospace;
             height: 100vh;
             width: 100vw;
             overflow: hidden;
-            display: grid;
-            grid-template-columns: 250px 1fr 300px;
-            grid-template-rows: 40px 1fr 200px;
-            gap: 5px;
-            padding: 5px;
-        }
-
-        /* --- CRT VE TARAMA EFEKTLERİ --- */
-        body::before {
-            content: " ";
-            display: block;
-            position: absolute;
-            top: 0; left: 0; bottom: 0; right: 0;
-            background: var(--crt-overlay);
-            z-index: 9999;
-            pointer-events: none;
-            background-size: 100% 3px, 3px 100%;
-        }
-
-        /* --- ÜST PANEL (NAV) --- */
-        nav {
-            grid-column: 1 / -1;
-            background: var(--dark-green);
-            display: flex;
-            align-items: center;
-            padding: 0 20px;
-            font-family: 'Orbitron', sans-serif;
-            font-size: 0.8rem;
-            border: 1px solid var(--neon-green);
-            justify-content: space-between;
-        }
-
-        /* --- SOL PANEL (SİSTEM DOSYALARI) --- */
-        aside.left-panel {
-            grid-row: 2 / 4;
-            background: var(--glass-bg);
-            border: 1px solid var(--neon-green);
-            padding: 15px;
-            overflow-y: auto;
-        }
-
-        .file-tree div {
-            margin: 8px 0;
-            padding-left: 15px;
-            border-left: 1px solid var(--dark-green);
-            transition: 0.3s;
-        }
-
-        .file-tree div:hover {
-            color: var(--cyber-blue);
-            text-shadow: 0 0 10px var(--cyber-blue);
-        }
-
-        /* --- ANA TERMİNAL (MERKEZ) --- */
-        main.terminal-core {
-            grid-row: 2;
-            background: rgba(0, 0, 0, 0.95);
-            border: 1px solid var(--neon-green);
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            padding: 20px;
-            overflow: hidden;
-            box-shadow: inset 0 0 30px var(--dark-green);
-        }
-
-        #output {
-            flex-grow: 1;
-            overflow-y: auto;
-            font-size: 0.9rem;
-            line-height: 1.4;
-            margin-bottom: 10px;
-        }
-
-        .input-area {
-            display: flex;
-            border-top: 1px solid var(--dark-green);
-            padding-top: 10px;
-        }
-
-        .input-area input {
-            background: transparent;
-            border: none;
-            color: var(--neon-green);
-            flex-grow: 1;
-            font-family: inherit;
-            outline: none;
-            font-size: 1rem;
-        }
-
-        /* --- ALT PANEL (LOGS) --- */
-        footer.logs {
-            grid-column: 2;
-            grid-row: 3;
-            background: var(--glass-bg);
-            border: 1px solid var(--neon-green);
-            padding: 10px;
-            font-size: 0.7rem;
-            overflow-y: auto;
-        }
-
-        /* --- SAĞ PANEL (NETWORK) --- */
-        aside.right-panel {
-            grid-row: 2 / 4;
-            background: var(--glass-bg);
-            border: 1px solid var(--neon-green);
-            padding: 15px;
-        }
-
-        .stat-bar {
-            height: 10px;
-            background: var(--dark-green);
-            margin: 10px 0;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .stat-progress {
-            height: 100%;
-            background: var(--neon-green);
-            width: 0%;
-            transition: width 0.5s;
-        }
-
-        /* --- SİSTEM EFEKTLERİ --- */
-        .glitch { animation: glitch 0.3s infinite; }
-        @keyframes glitch {
-            0% { transform: translate(0); }
-            20% { transform: translate(-2px, 2px); }
-            40% { transform: translate(-2px, -2px); }
-            60% { transform: translate(2px, 2px); }
-            80% { transform: translate(2px, -2px); }
-            100% { transform: translate(0); }
-        }
-
-        .loading-screen {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: black;
-            z-index: 10000;
             display: flex;
             justify-content: center;
             align-items: center;
-            flex-direction: column;
         }
+
+        /* --- SİBER ARKA PLAN (MATRIX + PARALLAX) --- */
+        #bg-canvas {
+            position: fixed;
+            top: 0; left: 0; z-index: 1;
+            filter: blur(1px);
+        }
+
+        .scanlines {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), 
+                        linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+            background-size: 100% 2px, 3px 100%;
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        /* --- ANA GİRİŞ MERKEZİ --- */
+        .neural-link-container {
+            position: relative;
+            z-index: 5;
+            width: 900px;
+            height: 600px;
+            display: flex;
+            background: var(--glass);
+            border: 1px solid var(--neon-purple);
+            box-shadow: 0 0 50px rgba(188, 19, 254, 0.2);
+            backdrop-filter: blur(15px);
+            clip-path: polygon(10% 0, 100% 0, 100% 90%, 90% 100%, 0 100%, 0 10%);
+        }
+
+        /* --- SOL PANEL: DURUM VE İSTATİSTİK --- */
+        .side-bar {
+            width: 300px;
+            border-right: 1px solid var(--neon-purple);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            font-family: 'Rajdhani', sans-serif;
+        }
+
+        .stat-box { margin-bottom: 20px; }
+        .stat-label { font-size: 0.7rem; color: var(--neon-purple); text-transform: uppercase; }
+        .stat-value { font-size: 1.2rem; color: var(--neon-blue); font-weight: bold; }
+        
+        .progress-mini {
+            width: 100%; height: 4px;
+            background: rgba(188, 19, 254, 0.1);
+            margin-top: 5px;
+            position: relative;
+        }
+        .progress-fill {
+            height: 100%; background: var(--neon-blue);
+            width: 0%; transition: width 0.3s;
+            box-shadow: 0 0 10px var(--neon-blue);
+        }
+
+        /* --- MERKEZ: GİRİŞ VE ANİMASYON --- */
+        .main-auth {
+            flex-grow: 1;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .phantom-logo {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 3rem;
+            color: #fff;
+            text-shadow: 0 0 10px var(--neon-purple), 0 0 20px var(--neon-purple);
+            margin-bottom: 50px;
+            letter-spacing: 10px;
+            animation: glitch-text 3s infinite;
+        }
+
+        @keyframes glitch-text {
+            0% { transform: skew(0deg); }
+            2% { transform: skew(10deg); color: var(--neon-blue); }
+            4% { transform: skew(-10deg); color: var(--alert-red); }
+            6% { transform: skew(0deg); }
+        }
+
+        .input-wrapper {
+            width: 100%;
+            max-width: 400px;
+            margin-bottom: 30px;
+        }
+
+        .cyber-input {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--neon-green);
+            padding: 15px;
+            color: var(--neon-green);
+            font-family: 'Fira Code';
+            font-size: 1rem;
+            text-align: center;
+            letter-spacing: 3px;
+            transition: 0.3s;
+        }
+
+        .cyber-input:focus {
+            box-shadow: 0 0 20px var(--neon-green);
+            border-color: #fff;
+        }
+
+        .access-btn {
+            background: none;
+            border: 2px solid var(--neon-purple);
+            color: var(--neon-purple);
+            padding: 15px 50px;
+            font-family: 'Orbitron';
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            cursor: pointer;
+            transition: 0.5s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .access-btn:hover {
+            background: var(--neon-purple);
+            color: #fff;
+            box-shadow: 0 0 40px var(--neon-purple);
+        }
+
+        /* --- SAĞ PANEL: LOG VE NETWORK --- */
+        .network-panel {
+            width: 150px;
+            border-left: 1px solid var(--neon-purple);
+            display: flex;
+            flex-direction: column;
+            padding: 10px;
+            font-size: 0.6rem;
+            overflow: hidden;
+        }
+
+        .log-entry { margin-bottom: 5px; opacity: 0.7; }
+
+        /* --- ÖZEL EFEKTLER --- */
+        .hud-circle {
+            position: absolute;
+            border: 1px dashed var(--neon-blue);
+            border-radius: 50%;
+            animation: rotate 30s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
     </style>
 </head>
 <body>
 
-    <div class="loading-screen" id="loader">
-        <h1 class="glitch">INITIALIZING ECHO_OS...</h1>
-        <div style="width: 300px; height: 2px; background: #003b00; margin-top: 20px;">
-            <div id="load-progress" style="width: 0%; height: 100%; background: #00ff41;"></div>
-        </div>
+    <canvas id="bg-canvas"></canvas>
+    <div class="scanlines"></div>
+
+    <div class="neural-link-container">
+        <!-- SOL PANEL -->
+        <aside class="side-bar">
+            <div class="top-stats">
+                <div class="stat-box">
+                    <div class="stat-label">System Integrity</div>
+                    <div class="stat-value" id="integrity-val">99.9%</div>
+                    <div class="progress-mini"><div class="progress-fill" style="width: 99%"></div></div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Neural Latency</div>
+                    <div class="stat-value" id="latency-val">4ms</div>
+                    <div class="progress-mini"><div class="progress-fill" id="latency-bar" style="width: 10%"></div></div>
+                </div>
+            </div>
+            
+            <div class="bottom-stats">
+                <div style="font-size: 0.8rem; color: var(--neon-green);">
+                    > SESSION: ACTIVE<br>
+                    > NODE: GOBAK_PHANTOM<br>
+                    > USER: AUTHORIZED
+                </div>
+            </div>
+        </aside>
+
+        <!-- MERKEZ -->
+        <main class="main-auth">
+            <div class="hud-circle" style="width: 500px; height: 500px; opacity: 0.2;"></div>
+            <div class="hud-circle" style="width: 450px; height: 450px; animation-direction: reverse; opacity: 0.1;"></div>
+            
+            <div class="phantom-logo">GOBAK_PHANTOM</div>
+            
+            <div class="input-wrapper">
+                <input type="text" class="cyber-input" placeholder="NEURAL_IDENTIFIER" id="username">
+            </div>
+            
+            <button class="access-btn" onclick="initiateBreach()">INITIATE BREACH</button>
+            
+            <div id="status-text" style="margin-top: 20px; font-size: 0.8rem;">Awaiting input...</div>
+        </main>
+
+        <!-- SAĞ PANEL -->
+        <aside class="network-panel" id="log-panel">
+            <!-- Dinamik Loglar Buraya -->
+        </aside>
     </div>
 
-    <nav>
-        <span>SYSTEM STATUS: <span id="pulse-node">STABLE</span></span>
-        <span id="clock">00:00:00</span>
-        <span>NODE: KONYA_SERVER_01</span>
-    </nav>
-
-    <aside class="left-panel">
-        <h3>FILE_EXPLORER</h3>
-        <div class="file-tree">
-            <div>📁 Root
-                <div>📁 bin</div>
-                <div>📁 etc</div>
-                <div>📁 home
-                    <div>📁 echo
-                        <div>📄 profile.dat</div>
-                        <div>📄 keys.gpg</div>
-                    </div>
-                </div>
-                <div>📁 var</div>
-                <div>📄 kernel.sys</div>
-            </div>
-        </div>
-    </aside>
-
-    <main class="terminal-core">
-        <div id="output"></div>
-        <div class="input-area">
-            <span style="margin-right: 10px;">root@echo_v3:~#</span>
-            <input type="text" id="cmdInput" autofocus>
-        </div>
-    </main>
-
-    <aside class="right-panel">
-        <h3>NETWORK_MONITOR</h3>
-        <div>CPU USAGE
-            <div class="stat-bar"><div class="stat-progress" id="cpu-bar"></div></div>
-        </div>
-        <div>RAM USAGE
-            <div class="stat-bar"><div class="stat-progress" id="ram-bar"></div></div>
-        </div>
-        <div>NET TRAFFIC
-            <canvas id="net-canvas" width="270" height="100"></canvas>
-        </div>
-        <div style="margin-top: 20px; font-size: 0.8rem; color: var(--cyber-blue);">
-            ACTIVE CONNECTIONS:
-            <ul id="conn-list" style="list-style: none; margin-top: 5px;"></ul>
-        </div>
-    </aside>
-
-    <footer class="logs" id="log-window">
-        [SYS_LOG]: Kernel initialized...
-    </footer>
-
     <script>
-        // KAPSAMLI SİSTEM MANTIĞI
-        const cmdInput = document.getElementById('cmdInput');
-        const output = document.getElementById('output');
-        const logWindow = document.getElementById('log-window');
+        // MATRIX & PARTICLE BACKGROUND
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
 
-        // YÜKLEME SİMÜLASYONU
-        let load = 0;
-        const loadInt = setInterval(() => {
-            load += Math.random() * 15;
-            document.getElementById('load-progress').style.width = load + "%";
-            if(load >= 100) {
-                clearInterval(loadInt);
-                document.getElementById('loader').style.display = 'none';
-                printOutput("ECHO_OS v3.0.0.1 Loaded.", "success-msg");
-                printOutput("Type 'help' to see unauthorized commands.");
+        const particles = [];
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2;
+                this.speedX = Math.random() * 3 - 1.5;
+                this.speedY = Math.random() * 3 - 1.5;
             }
-        }, 150);
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                if (this.x > canvas.width) this.x = 0;
+                if (this.x < 0) this.x = canvas.width;
+                if (this.y > canvas.height) this.y = 0;
+                if (this.y < 0) this.y = canvas.height;
+            }
+            draw() {
+                ctx.fillStyle = '#bc13fe';
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
 
-        // SAAT
+        for (let i = 0; i < 100; i++) particles.push(new Particle());
+
+        function animate() {
+            ctx.fillStyle = 'rgba(2, 2, 2, 0.1)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => { p.update(); p.draw(); });
+            requestAnimationFrame(animate);
+        }
+        animate();
+
+        // LOG SİSTEMİ
+        const logPanel = document.getElementById('log-panel');
+        const logs = [
+            "Handshaking...", "Bypassing firewall...", "Neural link established",
+            "Fetching kernel...", "Packet sniff active", "Encrypted tunnel open"
+        ];
+
         setInterval(() => {
-            document.getElementById('clock').innerText = new Date().toLocaleTimeString();
-        }, 1000);
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            entry.innerText = `[${new Date().toLocaleTimeString()}] ${logs[Math.floor(Math.random()*logs.length)]}`;
+            logPanel.prepend(entry);
+            if(logPanel.children.length > 20) logPanel.lastChild.remove();
+            
+            // Random Stats
+            document.getElementById('latency-val').innerText = Math.floor(Math.random() * 20) + "ms";
+            document.getElementById('latency-bar').style.width = Math.random() * 100 + "%";
+        }, 1500);
 
-        // KOMUT SİSTEMİ
-        const fileSystem = {
-            'kernel.sys': 'CORE KERNEL DATA: [ENCRYPTED]',
-            'profile.dat': 'USER: ECHO | RANK: ADMIN | CLEARANCE: LEVEL_9'
-        };
+        // GİRİŞ FONKSİYONU
+        function initiateBreach() {
+            const user = document.getElementById('username').value;
+            const status = document.getElementById('status-text');
+            
+            if(!user) {
+                status.innerText = "ERROR: IDENTIFIER REQUIRED";
+                status.style.color = "var(--alert-red)";
+                return;
+            }
 
-        cmdInput.addEventListener('keydown', (e) => {
-            if(e.key === 'Enter') {
-                const rawVal = cmdInput.value;
-                const [cmd, ...args] = rawVal.toLowerCase().split(' ');
+            status.innerText = "SYNCHRONIZING NEURAL WAVES...";
+            status.style.color = "var(--neon-blue)";
+            
+            setTimeout(() => {
+                status.innerHTML = `<span style="color:var(--neon-green)">BREACH SUCCESSFUL. WELCOME, ${user.toUpperCase()}.</span>`;
+                document.querySelector('.neural-link-container').style.boxShadow = "0 0 100px var(--neon-green)";
                 
-                printOutput(`<span style="color:#888">root@echo:~$</span> ${rawVal}`);
+                // Buraya sitenin ana terminaline yönlendirme veya açılma efekti eklenebilir
+                setTimeout(() => {
+                    alert("GOBAK_PHANTOM SİSTEMİNE HOŞ GELDİN, " + user);
+                }, 1000);
+            }, 2500);
+        }
 
-                switch(cmd) {
-                    case 'help':
-                        printOutput("Available: ls, cat, scan, clear, hack, exploit, exit");
-                        break;
-                    case 'ls':
-                        printOutput("bin/  etc/  home/  var/  kernel.sys  profile.dat");
-                        break;
-                    case 'cat':
-                        if(fileSystem[args[0]]) printOutput(fileSystem[args[0]]);
-                        else printOutput("Error: File not found or access denied.", "error-msg");
-                        break;
-                    case 'scan':
-                        printOutput("Scanning local network...");
-                        simulateProgress(2000, "Scan Complete: 3 hosts found.");
-                        break;
-                    case 'hack':
-                        if(!args[0]) printOutput("Error: No target specified.");
-                        else {
-                            printOutput(`Injecting payload into ${args[0]}...`);
-                            simulateProgress(3000, "SHELL ACCESS GRANTED.");
-                        }
-                        break;
-                    case 'clear':
-                        output.innerHTML = "";
-                        break;
-                    default:
-                        printOutput(`Command '${cmd}' not recognized.`, "error-msg");
-                }
-                cmdInput.value = "";
-                output.scrollTop = output.scrollHeight;
-            }
+        // 50 Fikir Entegrasyon Notları (JS içinde çalışanlar)
+        // 1. Koordinat Takibi
+        document.addEventListener('mousemove', (e) => {
+            const xPercent = (e.clientX / window.innerWidth) * 100;
+            const yPercent = (e.clientY / window.innerHeight) * 100;
+            document.getElementById('integrity-val').innerText = (99 + Math.random()).toFixed(2) + "%";
         });
-
-        function printOutput(text, className = "") {
-            const div = document.createElement('div');
-            div.className = className;
-            div.innerHTML = `> ${text}`;
-            output.appendChild(div);
-            
-            const log = document.createElement('div');
-            log.innerText = `[${new Date().toLocaleTimeString()}] ${text}`;
-            logWindow.prepend(log);
-        }
-
-        function simulateProgress(time, finalMsg) {
-            let p = 0;
-            const int = setInterval(() => {
-                p += 10;
-                printOutput(`Progress: [${'#'.repeat(p/10)}${'.'.repeat(10-p/10)}] ${p}%`);
-                if(p >= 100) {
-                    clearInterval(int);
-                    printOutput(finalMsg, "success-msg");
-                }
-            }, time/10);
-        }
-
-        // DİNAMİK İSTATİSTİKLER
-        setInterval(() => {
-            document.getElementById('cpu-bar').style.width = Math.floor(Math.random() * 100) + "%";
-            document.getElementById('ram-bar').style.width = Math.floor(Math.random() * 100) + "%";
-            
-            if(Math.random() > 0.8) {
-                const li = document.createElement('li');
-                li.innerText = `192.168.1.${Math.floor(Math.random()*255)}: CONNECTED`;
-                li.style.color = "var(--neon-green)";
-                document.getElementById('conn-list').prepend(li);
-                if(document.getElementById('conn-list').children.length > 5) {
-                    document.getElementById('conn-list').lastChild.remove();
-                }
-            }
-        }, 1000);
-
-        // NETWORK CANVAS
-        const nCanvas = document.getElementById('net-canvas');
-        const nCtx = nCanvas.getContext('2d');
-        let x = 0;
-        function drawNet() {
-            nCtx.strokeStyle = "#00ff41";
-            nCtx.beginPath();
-            nCtx.moveTo(x, 50);
-            nCtx.lineTo(x + 5, 50 + (Math.random() * 40 - 20));
-            nCtx.stroke();
-            x += 5;
-            if(x > nCanvas.width) {
-                x = 0;
-                nCtx.clearRect(0,0, nCanvas.width, nCanvas.height);
-            }
-            requestAnimationFrame(drawNet);
-        }
-        drawNet();
-
     </script>
 </body>
 </html>
