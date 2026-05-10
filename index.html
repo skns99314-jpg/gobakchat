@@ -3,57 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GOBALAK MAXIMUM VELOCITY</title>
+    <title>GOBALAK BABA NO1 - SQUAD</title>
     <style>
         body {
             background-color: #000;
+            color: #00ff00;
+            font-family: 'Courier New', Courier, monospace;
             margin: 0;
-            padding: 0;
+            padding: 10px;
             overflow-x: hidden;
-            background: radial-gradient(circle, #1a1a1a 0%, #000 100%);
+            line-height: 1.1;
         }
 
         #flood-container {
-            display: flex;
-            flex-direction: column;
-            padding: 10px;
+            font-size: 16px; /* İlk baştaki ideal boyut */
+            font-weight: bold;
         }
 
-        .flood-msg {
-            font-family: 'Arial Black', sans-serif;
-            font-size: 42px; /* Dev Puntolar */
-            font-weight: 900;
-            text-transform: uppercase;
-            line-height: 1;
-            margin: 2px 0;
+        .line {
             white-space: nowrap;
-            /* Renk geçişli ve parlayan yazı */
-            background: linear-gradient(90deg, #fe2c55, #d4af37, #fe2c55);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 10px rgba(254, 44, 85, 0.5);
-            animation: pulse 0.1s infinite;
+            border-bottom: 1px solid #111;
+            padding: 2px 0;
         }
 
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.02); }
-            100% { transform: scale(1); }
+        .marker {
+            color: #fe2c55;
+            margin-right: 8px;
         }
 
         #stats {
             position: fixed;
-            top: 20px;
-            left: 20px;
-            background: #fe2c55;
-            color: #fff;
-            padding: 15px 30px;
-            font-size: 24px;
-            font-family: sans-serif;
+            top: 10px;
+            right: 10px;
+            background: #d4af37;
+            color: #000;
+            padding: 8px 15px;
             font-weight: bold;
-            border-radius: 50px;
-            z-index: 9999;
-            box-shadow: 0 0 30px #fe2c55;
+            z-index: 1000;
+            border: 2px solid #fff;
         }
     </style>
 </head>
@@ -67,39 +54,23 @@
     const container = document.getElementById('flood-container');
     const totalDisplay = document.getElementById('total');
 
-    // Saniyede 800 mesaj için gecikme (1000ms / 800 = 1.25ms)
-    // Tarayıcı limitleri nedeniyle 1ms'ye çekildi (Maksimum hız)
-    const floodSpeed = 1; 
+    // Saniyede 500 mesaj (1000 / 500 = 2ms)
+    // Karışmaması için her döngüde kontrollü ekleme yapar.
+    const floodSpeed = 2; 
 
-    function startHyperFlood() {
-        // Performans için her döngüde birden fazla mesaj ekleyerek hızı katlıyoruz
+    function startPrecisionFlood() {
         setInterval(() => {
-            for(let i = 0; i < 5; i++) { // Her vuruşta 5 mesaj (800'ü garantilemek için)
-                const msg = document.createElement('div');
-                msg.className = 'flood-msg';
-                msg.innerText = `GOBALAK BABA NO1 - ${counter}`;
-                container.appendChild(msg);
-                counter++;
-            }
+            // Saniyede 500'ü yakalamak için her 2ms'de 1 mesaj
+            const msg = document.createElement('div');
+            msg.className = 'line';
+            msg.innerHTML = `<span class="marker">[NO1]</span> GOBALAK BABA NO1 - ${counter}`;
             
-            totalDisplay.innerText = counter.toLocaleString();
+            container.appendChild(msg);
+            totalDisplay.innerText = counter;
+            counter++;
 
-            // Otomatik kaydırma
+            // Aşağı kaydır
             window.scrollTo(0, document.body.scrollHeight);
 
-            // RAM yönetimi: Sayfa çok ağırlaşırsa eski mesajları temizle
-            if (counter % 2000 === 0) {
-                while (container.childNodes.length > 500) {
-                    container.removeChild(container.firstChild);
-                }
-            }
-        }, floodSpeed);
-    }
-
-    window.onload = () => {
-        startHyperFlood();
-    };
-</script>
-
-</body>
-</html>
+            // Performans ve karışıklığı önleme: 1000 mesajda bir temizlik
+            if (counter % 1000 === 0) {
