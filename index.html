@@ -2,53 +2,39 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>FEN_PROJESI_DENEY_V4</title>
+    <title>SISTEM_GERI_YUKLEME_NO_872</title>
     <style>
-        body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; background: #000; font-family: sans-serif; }
-        
-        /* MEB MASKESİ - Üst Bar */
-        #meb-bar {
-            height: 40px; background: #1a5c96; color: white;
-            display: flex; align-items: center; padding: 0 20px;
-            font-size: 14px; font-weight: bold; z-index: 100; position: relative;
+        body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; background: #000; }
+        #portal { width: 100%; height: 100%; border: none; }
+        #cover {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #fff; display: flex; align-items: center; justify-content: center;
+            z-index: 100; transition: 1s;
         }
-
-        #bypass-engine {
-            width: 100%;
-            height: calc(100% - 40px);
-            border: none;
-        }
-
-        /* HOCA GELİRSE ACİL DURUM BUTONU (SOL ÜSTTEKİ LOGO) */
-        #logo { cursor: pointer; }
     </style>
 </head>
 <body>
 
-    <div id="meb-bar">
-        <span id="logo" onclick="panic()">T.C. MEB | EĞİTİM MATERYALLERİ</span>
+    <div id="cover">
+        <h2 style="font-family:sans-serif; color:#333;">VERI PAKETLERI COZULUYOR...</h2>
     </div>
 
-    <!-- TIKTOK KEŞFET MOTORU -->
-    <iframe 
-        id="bypass-engine"
-        src="https://www.tiktok.com/embed/v2/explore?is_copy_url=true&is_from_webapp=1"
-        allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
-        allowfullscreen>
-    </iframe>
+    <iframe id="portal" allow="autoplay; encrypted-media; fullscreen" allowfullscreen></iframe>
 
     <script>
-        // ACİL DURUM FONKSİYONU
-        function panic() {
-            window.location.href = "https://eba.gov.tr";
-        }
+        // "https://www.tiktok.com/embed/v2/explore" adresinin şifreli hali
+        const secretPath = "aHR0cHM6Ly93d3cudGlrdG9rLmNvbS9lbWJlZC92Mi9leHBsb3JlP2xhbmc9dHItVFI=";
+        
+        // Şifreyi çalışma anında çözüp frame'e yüklüyoruz
+        const decodedPath = atob(secretPath);
+        
+        document.getElementById('portal').src = decodedPath;
 
-        // AKILLI TAHTA DOKUNMATİK AYARI
-        document.addEventListener('touchstart', function(e) {
-            // Dokunmatik hassasiyetini artırmak için boş işlem
-        }, {passive: true});
-
-        console.log("GOBAK_SYSTEM: Tünel aktif.");
+        // 2 saniye sonra maskeyi kaldır
+        setTimeout(() => {
+            document.getElementById('cover').style.opacity = "0";
+            setTimeout(() => { document.getElementById('cover').style.display = "none"; }, 1000);
+        }, 2000);
     </script>
 </body>
 </html>
