@@ -2,62 +2,268 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>TERMINAL_ACCESS</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ECHO_ULTIMATE_ACCESS</title>
     <style>
-        body {
-            background-color: #050505;
-            color: #00FF41;
-            font-family: 'Courier New', Courier, monospace;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            margin: 0;
-            overflow: hidden;
-            text-shadow: 0 0 5px #00FF41;
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Source+Code+Pro:wght@300;500&display=swap');
+
+        :root {
+            --primary: #00ff41;
+            --secondary: #008f11;
+            --accent: #003b00;
+            --danger: #ff003c;
+            --bg: #020202;
+            --glass: rgba(0, 20, 0, 0.85);
         }
-        .matrix-bg {
-            position: absolute;
+
+        * { margin: 0; padding: 0; box-sizing: border-box; cursor: crosshair; }
+
+        body {
+            background-color: var(--bg);
+            color: var(--primary);
+            font-family: 'Source Code Pro', monospace;
+            height: 100vh;
+            overflow: hidden;
+            perspective: 1000px;
+        }
+
+        /* MATRIX YAĞMURU ARKA PLANI */
+        #matrix-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1;
+            opacity: 0.3;
+        }
+
+        .overlay {
+            position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            z-index: -1;
-            opacity: 0.1;
+            background: radial-gradient(circle, transparent 20%, var(--bg) 150%);
+            z-index: 2;
+            pointer-events: none;
         }
-        .terminal {
-            width: 80%;
-            max-width: 800px;
-            background: rgba(0, 0, 0, 0.9);
-            border: 1px solid #00FF41;
-            padding: 20px;
-            box-shadow: 0 0 20px rgba(0, 255, 65, 0.2);
+
+        /* ANA KONTEYNER */
+        .main-frame {
+            position: relative;
+            z-index: 3;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
         }
-        .line {
-            margin-bottom: 10px;
-            white-space: nowrap;
+
+        .login-module {
+            background: var(--glass);
+            border: 2px solid var(--primary);
+            padding: 40px;
+            width: 450px;
+            position: relative;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 0 50px var(--accent), inset 0 0 20px var(--accent);
+            animation: glitch-border 5s infinite;
+        }
+
+        @keyframes glitch-border {
+            0%, 100% { border-color: var(--primary); }
+            50% { border-color: var(--secondary); box-shadow: 0 0 70px var(--primary); }
+            51% { border-color: var(--danger); }
+            52% { border-color: var(--primary); }
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            font-family: 'Orbitron', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            animation: text-pulse 2s infinite;
+        }
+
+        @keyframes text-pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(0.98); text-shadow: 0 0 20px var(--primary); }
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 25px;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 0.8rem;
+            margin-bottom: 8px;
+            color: var(--secondary);
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px;
+            background: rgba(0, 59, 0, 0.2);
+            border: 1px solid var(--secondary);
+            color: var(--primary);
+            font-family: inherit;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        .input-group input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 15px var(--accent);
+            background: rgba(0, 59, 0, 0.4);
+        }
+
+        .btn-access {
+            width: 100%;
+            padding: 15px;
+            background: var(--primary);
+            color: var(--bg);
+            border: none;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.4s;
+            position: relative;
             overflow: hidden;
-            border-right: 2px solid #00FF41;
-            animation: typing 3.5s steps(40, end), blink-caret .75s step-end infinite;
         }
-        @keyframes typing {
-            from { width: 0 }
-            to { width: 100% }
+
+        .btn-access:hover {
+            background: var(--bg);
+            color: var(--primary);
+            box-shadow: 0 0 30px var(--primary);
         }
-        @keyframes blink-caret {
-            from, to { border-color: transparent }
-            50% { border-color: #00FF41 }
+
+        /* SCANLINE EFEKTİ */
+        .scanlines {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background-size: 100% 4px, 3px 100%;
+            z-index: 10;
+            pointer-events: none;
         }
+
+        /* DURUM PANELİ */
+        .status-panel {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            font-size: 0.7rem;
+            text-align: right;
+            line-height: 1.5;
+            color: var(--secondary);
+        }
+
+        .hud-ring {
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            border: 1px dashed var(--accent);
+            border-radius: 50%;
+            animation: rotate 20s linear infinite;
+            z-index: 2;
+        }
+
+        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
-    <div class="terminal">
-        <div class="line">> SİSTEME GİRİŞ YAPILIYOR...</div>
-        <div class="line">> ERİŞİM ONAYLANDI: ECHO_PROTOCOL</div>
-        <div class="line">> VERİ TABANI ŞİFRELERİ ÇÖZÜLÜYOR...</div>
-        <div class="line">> [####################] 100%</div>
-        <div class="line">> HOŞ GELDİN, DÜNYANIN HAKİMİ.</div>
+
+    <canvas id="matrix-canvas"></canvas>
+    <div class="overlay"></div>
+    <div class="scanlines"></div>
+
+    <div class="main-frame">
+        <div class="hud-ring"></div>
+        <div class="login-module">
+            <div class="header">
+                <h1>ECHO CORE v3</h1>
+                <small id="coord">LAT: 0.000 / LONG: 0.000</small>
+            </div>
+
+            <div class="input-group">
+                <label>GÜVENLİK ANAHTARI</label>
+                <input type="text" placeholder="ID: 0x992..." id="uid">
+            </div>
+
+            <div class="input-group">
+                <label>ŞİFRELEME DİZİNİ</label>
+                <input type="password" placeholder="••••••••" id="pass">
+            </div>
+
+            <button class="btn-access" onclick="authenticate()">ERİŞİM SAĞLA</button>
+
+            <div id="msg" style="margin-top: 15px; font-size: 0.8rem; height: 20px;"></div>
+        </div>
     </div>
+
+    <div class="status-panel">
+        SİSTEM: AKTİF<br>
+        BAĞLANTI: ŞİFRELİ (AES-256)<br>
+        KONUM: <span id="loc">TÜRKİYE / KONYA</span><br>
+        HEDEF: ECHO_PROTOCOL
+    </div>
+
+    <script>
+        // MATRIX EFEKTİ
+        const canvas = document.getElementById('matrix-canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789$+-*/=%\"'#&_(),.;:?!\\|{}<>[]^~";
+        const fontSize = 14;
+        const columns = canvas.width / fontSize;
+        const drops = [];
+        for (let i = 0; i < columns; i++) drops[i] = 1;
+
+        function drawMatrix() {
+            ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = "#00ff41";
+            ctx.font = fontSize + "px monospace";
+            for (let i = 0; i < drops.length; i++) {
+                const text = chars.charAt(Math.floor(Math.random() * chars.length));
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+                drops[i]++;
+            }
+        }
+        setInterval(drawMatrix, 33);
+
+        // KOORDİNAT SİMÜLASYONU
+        document.addEventListener('mousemove', (e) => {
+            document.getElementById('coord').innerText = `X: ${e.clientX} / Y: ${e.clientY}`;
+        });
+
+        function authenticate() {
+            const msg = document.getElementById('msg');
+            msg.innerText = "ŞİFRELER ÇÖZÜLÜYOR...";
+            msg.style.color = "#00ff41";
+            
+            setTimeout(() => {
+                msg.innerText = "ERİŞİM REDDEDİLDİ: YETERSİZ YETKİ";
+                msg.style.color = "#ff003c";
+                // Sarsıntı efekti
+                document.querySelector('.login-module').style.animation = 'none';
+                setTimeout(() => {
+                    document.querySelector('.login-module').style.animation = 'glitch-border 0.2s infinite';
+                }, 10);
+            }, 2000);
+        }
+    </script>
 </body>
 </html>
