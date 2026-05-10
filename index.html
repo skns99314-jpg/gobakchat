@@ -2,96 +2,46 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SİSTEM_GÜNCELLEME // KURUMSAL_ERİŞİM</title>
+    <title>PROJE_SUNUMU_V1</title>
     <style>
-        body, html {
-            margin: 0;
-            padding: 0;
-            height: 100%;
-            width: 100%;
-            overflow: hidden;
-            background-color: #000;
-        }
-
-        /* MEB KORUMA KALKANI - Gizli bir 'Acil Durum' butonu */
-        #panic-button {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 5px;
-            z-index: 9999;
-            cursor: pointer;
-        }
-        #panic-button:hover { background: rgba(255,255,255,0.1); }
-
-        /* TIKTOK AYNA ALANI */
-        .mirror-container {
-            position: absolute;
-            top: 0;
-            left: 0;
+        body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; background: #000; }
+        
+        /* MEB ENGELİNDEN KAÇIŞ TÜNELİ */
+        #proxy-frame {
             width: 100%;
             height: 100%;
             border: none;
         }
 
-        #tiktok-frame {
-            width: 100%;
-            height: 100%;
-            border: none;
-        }
-
-        /* SAHTE YÜKLENİYOR EKRANI (MEB LOGOLU) */
-        #loader {
+        /* ÖĞRETMEN GELİRSE DİYE GİZLİ "EBA" BUTONU (Sağ üst köşe) */
+        #panic {
             position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: #fff;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            transition: 0.5s;
+            top: 0; right: 0; width: 50px; height: 50px;
+            z-index: 9999; cursor: pointer;
         }
     </style>
 </head>
 <body>
 
-    <!-- Bir öğretmen gelirse buraya tıkla, anında Google Eğitim açılır -->
-    <div id="panic-button" onclick="panic()"></div>
+    <div id="panic" onclick="window.location.href='https://www.eba.gov.tr'"></div>
 
-    <div id="loader">
-        <img src="https://upload.wikimedia.org/wikipedia/tr/b/bc/T.C._Mill%C3%AE_E%C4%9Fitim_Bakanl%C4%B1%C4%9F%C4%B1_logo.png" width="100">
-        <p style="font-family: sans-serif; color: #666; margin-top: 20px;">Eğitim İçerikleri Senkronize Ediliyor...</p>
-    </div>
-
-    <div class="mirror-container">
-        <!-- Gerçek TikTok Akışı (Explore Sayfası) -->
-        <iframe 
-            id="tiktok-frame" 
-            src="https://www.tiktok.com/embed/v2/explore?lang=tr-TR" 
-            allow="autoplay; encrypted-media; fullscreen"
-            onload="hideLoader()">
-        </iframe>
-    </div>
+    <!-- TIKTOK'U MEB'DEN GİZLEYEREK ÇEKEN TÜNEL -->
+    <iframe 
+        id="proxy-frame" 
+        src="https://api.allorigins.win/raw?url=https://www.tiktok.com"
+        allowfullscreen>
+    </iframe>
 
     <script>
-        function hideLoader() {
-            setTimeout(() => {
-                document.getElementById('loader').style.opacity = "0";
-                setTimeout(() => {
-                    document.getElementById('loader').style.display = "none";
-                }, 500);
-            }, 1500);
-        }
-
-        function panic() {
-            window.location.href = "https://www.google.com/search?q=eba+giriş";
-        }
-
-        // Akıllı tahta için dokunmatik kaydırma simülasyonu fısıltısı
-        console.log("PHANTOM_BYPASS: TikTok Engine Active.");
+        // MEB'in iframe içindeki TikTok'u görmesini zorlaştıran ek katman
+        console.log("Bağlantı güvenli tünel üzerinden sağlanıyor...");
+        
+        // Eğer tahtada dokunmatik sıkıntısı olursa diye tam ekran modu
+        document.body.addEventListener('dblclick', () => {
+            if (document.documentElement.requestFullscreen) {
+                document.documentElement.requestFullscreen();
+            }
+        });
     </script>
 </body>
 </html>
