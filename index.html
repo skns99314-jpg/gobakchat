@@ -2,97 +2,62 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GOBAK CHAT | SOON</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <title>TERMINAL_ACCESS</title>
     <style>
-        body, html {
-            margin: 0;
-            padding: 0;
-            height: 100%;
+        body {
+            background-color: #050505;
+            color: #00FF41;
+            font-family: 'Courier New', Courier, monospace;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), 
-                        url('https://upload.wikimedia.org/wikipedia/commons/b/b4/Flag_of_Turkey.svg') center/cover no-repeat fixed;
-            color: white;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
             overflow: hidden;
+            text-shadow: 0 0 5px #00FF41;
         }
-
-        .container {
-            text-align: center;
-            backdrop-filter: blur(8px);
-            background: rgba(255, 255, 255, 0.1);
-            padding: 50px;
-            border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8);
+        .matrix-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.1;
         }
-
-        h1 {
-            font-size: 4rem;
+        .terminal {
+            width: 80%;
+            max-width: 800px;
+            background: rgba(0, 0, 0, 0.9);
+            border: 1px solid #00FF41;
+            padding: 20px;
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.2);
+        }
+        .line {
             margin-bottom: 10px;
-            text-transform: uppercase;
-            letter-spacing: 5px;
-            background: linear-gradient(to right, #ffffff, #ff0000);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: glow 2s ease-in-out infinite alternate;
+            white-space: nowrap;
+            overflow: hidden;
+            border-right: 2px solid #00FF41;
+            animation: typing 3.5s steps(40, end), blink-caret .75s step-end infinite;
         }
-
-        h2 {
-            font-size: 1.5rem;
-            letter-spacing: 10px;
-            color: #ddd;
-            margin-bottom: 30px;
+        @keyframes typing {
+            from { width: 0 }
+            to { width: 100% }
         }
-
-        .social-icons {
-            margin-top: 20px;
-        }
-
-        .social-icons a {
-            color: white;
-            font-size: 1.5rem;
-            margin: 0 15px;
-            text-decoration: none;
-            transition: 0.3s;
-        }
-
-        .social-icons a:hover {
-            color: #ff0000;
-            transform: scale(1.2);
-        }
-
-        .creator-tag {
-            margin-top: 40px;
-            font-size: 0.9rem;
-            color: #aaa;
-        }
-
-        @keyframes glow {
-            from { text-shadow: 0 0 10px #fff, 0 0 20px #ff0000; }
-            to { text-shadow: 0 0 20px #fff, 0 0 30px #ff0000; }
+        @keyframes blink-caret {
+            from, to { border-color: transparent }
+            50% { border-color: #00FF41 }
         }
     </style>
 </head>
 <body>
-
-    <div class="container">
-        <h1>GOBAK CHAT</h1>
-        <h2>YAKINDA SİZLERLE</h2>
-        
-        <div class="social-icons">
-            <a href="#"><i class="fab fa-discord"></i></a>
-            <a href="#"><i class="fab fa-instagram"></i></a>
-            <a href="#"><i class="fab fa-github"></i></a>
-        </div>
-
-        <div class="creator-tag">
-            By: <strong>ömerbabapiromax</strong>
-        </div>
+    <div class="terminal">
+        <div class="line">> SİSTEME GİRİŞ YAPILIYOR...</div>
+        <div class="line">> ERİŞİM ONAYLANDI: ECHO_PROTOCOL</div>
+        <div class="line">> VERİ TABANI ŞİFRELERİ ÇÖZÜLÜYOR...</div>
+        <div class="line">> [####################] 100%</div>
+        <div class="line">> HOŞ GELDİN, DÜNYANIN HAKİMİ.</div>
     </div>
-
 </body>
 </html>
