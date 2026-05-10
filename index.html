@@ -3,44 +3,90 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GUBALAK DOMINATION</title>
+    <title>GUBALAK DOMINATION - NO LIMIT</title>
     <style>
-        body {
-            background-color: #000;
-            color: #00ff00; /* Hacker yeşili */
-            font-family: 'Courier New', Courier, monospace;
+        body, html {
             margin: 0;
-            padding: 10px;
-            overflow-x: hidden;
-            word-wrap: break-word;
-            line-height: 1.1;
+            padding: 0;
+            background-color: #000;
+            /* Kaydırma çubuğunu gizle ama kaydırmaya izin ver */
+            scrollbar-width: none; 
+        }
+        body::-webkit-scrollbar {
+            display: none;
+        }
+
+        #matrix-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
         }
 
         #flood-container {
-            font-size: 12px;
+            position: absolute;
+            top: 0;
+            left: 10px;
+            width: calc(100% - 20px);
+            z-index: 2;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 13px;
             font-weight: bold;
-            text-shadow: 0 0 3px #00ff00;
+            color: #00ff00;
+            text-shadow: 0 0 5px #00ff00;
+            line-height: 1.1;
+            padding-bottom: 50px; /* Altta boşluk bırak */
         }
 
         .count-marker {
-            color: #fe2c55; /* TikTok kırmızısı vurgu */
+            color: #fe2c55;
             margin-right: 5px;
         }
     </style>
 </head>
 <body>
 
+<canvas id="matrix-bg"></canvas>
 <div id="flood-container"></div>
 
 <script>
+    // --- MATRIX ARKA PLAN ---
+    const canvas = document.getElementById('matrix-bg');
+    const ctx = canvas.getContext('2d');
+
+    function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    const characters = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿ';
+    const fontSize = 16;
+    const columns = canvas.width / fontSize;
+    const drops = Array(Math.floor(columns)).fill(1);
+
+    function drawMatrix() {
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#0F0';
+        ctx.font = fontSize + 'px monospace';
+
+        for (let i = 0; i < drops.length; i++) {
+            const text = characters.charAt(Math.floor(Math.random() * characters.length));
+            ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+            if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+            drops[i]++;
+        }
+    }
+
+    // --- SINIRSIZ MESAJ AKIŞI ---
     let counter = 1;
     const container = document.getElementById('flood-container');
-
-    // Saniyede 500 mesaj için gecikme yaklaşık 2ms
-    // Ancak tarayıcı her 2ms'de bir ekrana çizim yapamaz.
-    // Bu yüzden performansı artırmak için her döngüde 10'arlı mesaj basıyoruz.
     const batchSize = 10; 
-    const floodSpeed = 20; // 1000ms / (500/10) = 20ms
+    const floodSpeed = 20; // Saniyede toplam 500 mesaj (50 x 10)
 
     function startFlooding() {
         setInterval(() => {
@@ -48,27 +94,21 @@
             
             for(let i = 0; i < batchSize; i++) {
                 const msg = document.createElement('div');
-                msg.innerHTML = `<span class="count-marker">[#${counter}]</span> GOBAK BABA NO1 - ${counter}`;
+                msg.innerHTML = `<span class="count-marker">[#${counter}]</span> GUBALAK BABADIR - ${counter}`;
                 fragment.appendChild(msg);
                 counter++;
             }
 
             container.appendChild(fragment);
 
-            // Ekranı en aşağı kaydır
+            // SİLME İŞLEMİ KALDIRILDI - Sayfayı en aşağı kaydırır
             window.scrollTo(0, document.body.scrollHeight);
 
-            // RAM yönetimi: Tarayıcının çökmesini önlemek için 20.000 satırdan sonrasını temizle
-            if (container.children.length > 2000000) {
-                for (let i = 0; i < batchSize; i++) {
-                    container.removeChild(container.firstChild);
-                }
-            }
         }, floodSpeed);
     }
 
     window.onload = () => {
-        console.log("Gubalak Ultra Speed Mode: Active");
+        setInterval(drawMatrix, 33);
         startFlooding();
     };
 </script>
