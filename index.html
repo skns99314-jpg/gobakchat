@@ -3,146 +3,126 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Terminal</title>
+    <title>Advanced Cyber Grid</title>
     <style>
         body {
             margin: 0;
             padding: 0;
-            background-color: #020202; /* Tam siyah yerine çok koyu bir gri/yeşil alt tonu */
+            background-color: #000;
             overflow: hidden;
+            font-family: 'Consolas', 'Courier New', monospace;
         }
 
         canvas {
             display: block;
+            filter: contrast(1.2) brightness(1.1); /* Renkleri daha keskin yap */
         }
 
-        /* Eski tip Hacker CRT Monitör Efekti */
-        .crt-ekran {
+        /* Ekrandaki statik parazit efekti */
+        .overlay {
             position: fixed;
             top: 0;
             left: 0;
-            width: 100vw;
-            height: 100vh;
-            /* Tarama çizgileri (Scanlines) */
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
-                        linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
-            background-size: 100% 4px, 3px 100%;
-            pointer-events: none; /* Farenin canvas ile etkileşime girmesine izin ver */
-            z-index: 10;
-            /* Monitör köşelerindeki karanlık vinyet efekti */
-            box-shadow: inset 0 0 100px rgba(0, 200, 0, 0.15); 
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 0, 0, 0.15),
+                rgba(0, 0, 0, 0.15) 1px,
+                transparent 1px,
+                transparent 2px
+            );
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        /* Köşelerdeki hafif kararma */
+        .vignette {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, transparent 50%, rgba(0, 0, 0, 0.8) 150%);
+            pointer-events: none;
+            z-index: 6;
         }
     </style>
 </head>
 <body>
 
-    <!-- Monitör efekti katmanı -->
-    <div class="crt-ekran"></div>
-    
-    <!-- Ana veri akışı -->
-    <canvas id="hackerArkaplan"></canvas>
+    <div class="overlay"></div>
+    <div class="vignette"></div>
+    <canvas id="matrixCanvas"></canvas>
 
     <script>
-        const canvas = document.getElementById('hackerArkaplan');
+        const canvas = document.getElementById('matrixCanvas');
         const ctx = canvas.getContext('2d');
 
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
 
-        // Binary, Hex kodları ve özel karakterlerin karışımı
-        const karakterler = '0101010101010101010101ABCDEF0123456789!@#$%>?/;';
-        const karakterDizisi = karakterler.split('');
+        // Karakter havuzu: Matrix + Hex + Binary
+        const alphabet = "日한0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZﾊﾐﾋｰｳｼﾅﾓﾆｻﾜﾂｵﾘｱﾎﾃﾏｹﾒｴｶｷﾑﾕﾗｾﾈｽﾀﾇﾍ";
+        
+        const fontSize = 16;
+        const columns = canvas.width / fontSize;
 
-        const fontBoyutu = 14;
-        const sutunlar = canvas.width / fontBoyutu;
-
-        const damlalar = [];
-        const hizlar = []; // Her veri sütununun kendi hızı olacak
-
-        // Başlangıç değerlerini ata
-        for (let i = 0; i < sutunlar; i++) {
-            damlalar[i] = Math.random() * -100; // Ekrana girmeden önce rastgele bir yükseklikte başlasınlar
-            hizlar[i] = Math.random() * 0.7 + 0.3; // Standarttan farklı, rastgele hızlar
+        // Her sütun için özel bir obje oluşturuyoruz (daha fazla kontrol için)
+        const rainDrops = [];
+        for (let x = 0; x < columns; x++) {
+            rainDrops[x] = {
+                y: Math.random() * -canvas.height, // Rastgele başlangıç yüksekliği
+                speed: Math.random() * 2 + 1,      // Her sütun farklı hızda
+                chars: []                          // Kendi karakter geçmişini tutabilir (opsiyonel)
+            };
         }
 
-        // Fare etkileşimini dinle
-        let fareX = -100;
-        let fareY = -100;
-        window.addEventListener('mousemove', (e) => {
-            fareX = e.clientX;
-            fareY = e.clientY;
-        });
-        window.addEventListener('mouseout', () => {
-            fareX = -100;
-            fareY = -100;
-        });
-
-        function ekranCiz() {
-            // Eski izleri silerken koyu bir iz bırak (kuyruk efekti)
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.08)';
+        const draw = () => {
+            // Arka planı hafif şeffaf siyahla kapla (iz bırakma efekti)
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            ctx.font = 'bold ' + fontBoyutu + 'px "Courier New", monospace';
-
-            for (let i = 0; i < damlalar.length; i++) {
-                const rastgeleKarakter = karakterDizisi[Math.floor(Math.random() * karakterDizisi.length)];
+            for (let i = 0; i < rainDrops.length; i++) {
+                // Rastgele karakter seç
+                const text = alphabet.charAt(Math.floor(Math.random() * alphabet.length));
                 
-                const x = i * fontBoyutu;
-                const y = damlalar[i] * fontBoyutu;
+                // Renk katmanları
+                // 1. En öndeki karakter (Beyazımsı yeşil - Parlayan uç)
+                ctx.fillStyle = '#e0ffe0';
+                ctx.font = `bold ${fontSize}px monospace`;
+                ctx.shadowBlur = 8;
+                ctx.shadowColor = '#00ff41';
+                ctx.fillText(text, i * fontSize, rainDrops[i].y * fontSize);
 
-                // Farenin veriye olan uzaklığını ölç
-                const mesafeX = Math.abs(x - fareX);
-                const mesafeY = Math.abs(y - fareY);
+                // 2. Takip eden gövde karakterleri (Matrix Yeşili)
+                ctx.fillStyle = '#00ff41';
+                ctx.shadowBlur = 2;
+                // Bir önceki karakteri çiz (daha sönük)
+                ctx.fillText(alphabet.charAt(Math.random() * alphabet.length), i * fontSize, (rainDrops[i].y - 1) * fontSize);
+
+                // 3. Çok daha sönük arka plan karakterleri (Derinlik hissi)
+                ctx.fillStyle = '#003300';
+                ctx.shadowBlur = 0;
+                ctx.fillText(text, i * fontSize, (rainDrops[i].y - 5) * fontSize);
+
+                // Hareketi güncelle
+                if (rainDrops[i].y * fontSize > canvas.height && Math.random() > 0.975) {
+                    rainDrops[i].y = 0;
+                }
                 
-                // Eğer fare yakınlardaysa veriyi "boz" (kırmızı glitch)
-                if (mesafeX < 60 && mesafeY < 60) {
-                    ctx.fillStyle = '#ff2a2a'; 
-                    ctx.shadowBlur = 15;
-                    ctx.shadowColor = '#ff2a2a';
-                } 
-                // Bazen rastgele bir kod deşifre ediliyormuş gibi anlık beyaz parlasın
-                else if (Math.random() > 0.985) {
-                    ctx.fillStyle = '#ffffff';
-                    ctx.shadowBlur = 10;
-                    ctx.shadowColor = '#ffffff';
-                } 
-                // Standart hacker yeşili
-                else {
-                    ctx.fillStyle = '#0fa'; // Hafif neon bir yeşil/cyan karışımı
-                    ctx.shadowBlur = 3;
-                    ctx.shadowColor = '#0fa';
-                }
-
-                ctx.fillText(rastgeleKarakter, x, y);
-
-                // Veri ekranın altına indiğinde
-                if (y > canvas.height && Math.random() > 0.975) {
-                    damlalar[i] = 0; // Başa sar
-                    hizlar[i] = Math.random() * 0.7 + 0.3; // Hızını değiştir (dinamik akış)
-                }
-
-                // Kendi hızına göre aşağı düşmeye devam etsin
-                damlalar[i] += hizlar[i];
+                rainDrops[i].y += rainDrops[i].speed;
             }
-            
-            // Animasyonu en yüksek performansta (60FPS) çalıştır
-            requestAnimationFrame(ekranCiz);
-        }
+        };
 
-        // Sistemi başlat
-        ekranCiz();
-
-        // Pencere boyutu değiştiğinde tepki ver
+        // Pencere yeniden boyutlandırma
         window.addEventListener('resize', () => {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
-            
-            const yeniSutunlar = canvas.width / fontBoyutu;
-            for (let i = damlalar.length; i < yeniSutunlar; i++) {
-                damlalar[i] = Math.random() * -100;
-                hizlar[i] = Math.random() * 0.7 + 0.3;
-            }
         });
+
+        // Akıcılık için 30-60 FPS arası döngü
+        setInterval(draw, 35);
     </script>
 </body>
 </html>
