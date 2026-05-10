@@ -1,128 +1,41 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
+	<meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advanced Cyber Grid</title>
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            background-color: #000;
-            overflow: hidden;
-            font-family: 'Consolas', 'Courier New', monospace;
-        }
-
-        canvas {
-            display: block;
-            filter: contrast(1.2) brightness(1.1); /* Renkleri daha keskin yap */
-        }
-
-        /* Ekrandaki statik parazit efekti */
-        .overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: repeating-linear-gradient(
-                0deg,
-                rgba(0, 0, 0, 0.15),
-                rgba(0, 0, 0, 0.15) 1px,
-                transparent 1px,
-                transparent 2px
-            );
-            pointer-events: none;
-            z-index: 5;
-        }
-
-        /* Köşelerdeki hafif kararma */
-        .vignette {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle, transparent 50%, rgba(0, 0, 0, 0.8) 150%);
-            pointer-events: none;
-            z-index: 6;
-        }
-    </style>
+	<title>Fake Windows 10 Update Screen Prank</title>
+	<link rel="canonical" href="https://pranx.com/win10-update/">
+	<meta name="description" content="Never ending Windows 10 upgrade prank. Trick your friends opening this screen on their computer and watch them wondering what's going on.">
+	<meta name="keywords" content="windows10,upgrade">
+	<meta property="fb:admins" content="fricikoma">
+	<meta property="og:title" content="Fake Windows 10 Update Screen Prank">
+	<meta property="og:type" content="website">
+	<meta property="og:url" content="https://pranx.com/win10-update/">
+	<meta property="og:image" content="https://pranx.com/win10-update/social.jpg">
+	<meta property="og:description" content="Never ending Windows 10 upgrade prank. Trick your friends opening this screen on their computer and watch them wondering what's going on.">
+	<script src="/images/_jquery/ui/jquery-min.js"></script>
+	<script src="script.js"></script>
+	<link rel="stylesheet" href="style.css">
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0], j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-5RJ4ST6');</script>
 </head>
 <body>
-
-    <div class="overlay"></div>
-    <div class="vignette"></div>
-    <canvas id="matrixCanvas"></canvas>
-
-    <script>
-        const canvas = document.getElementById('matrixCanvas');
-        const ctx = canvas.getContext('2d');
-
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-
-        // Karakter havuzu: Matrix + Hex + Binary
-        const alphabet = "日한0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZﾊﾐﾋｰｳｼﾅﾓﾆｻﾜﾂｵﾘｱﾎﾃﾏｹﾒｴｶｷﾑﾕﾗｾﾈｽﾀﾇﾍ";
-        
-        const fontSize = 16;
-        const columns = canvas.width / fontSize;
-
-        // Her sütun için özel bir obje oluşturuyoruz (daha fazla kontrol için)
-        const rainDrops = [];
-        for (let x = 0; x < columns; x++) {
-            rainDrops[x] = {
-                y: Math.random() * -canvas.height, // Rastgele başlangıç yüksekliği
-                speed: Math.random() * 2 + 1,      // Her sütun farklı hızda
-                chars: []                          // Kendi karakter geçmişini tutabilir (opsiyonel)
-            };
-        }
-
-        const draw = () => {
-            // Arka planı hafif şeffaf siyahla kapla (iz bırakma efekti)
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-            for (let i = 0; i < rainDrops.length; i++) {
-                // Rastgele karakter seç
-                const text = alphabet.charAt(Math.floor(Math.random() * alphabet.length));
-                
-                // Renk katmanları
-                // 1. En öndeki karakter (Beyazımsı yeşil - Parlayan uç)
-                ctx.fillStyle = '#e0ffe0';
-                ctx.font = `bold ${fontSize}px monospace`;
-                ctx.shadowBlur = 8;
-                ctx.shadowColor = '#00ff41';
-                ctx.fillText(text, i * fontSize, rainDrops[i].y * fontSize);
-
-                // 2. Takip eden gövde karakterleri (Matrix Yeşili)
-                ctx.fillStyle = '#00ff41';
-                ctx.shadowBlur = 2;
-                // Bir önceki karakteri çiz (daha sönük)
-                ctx.fillText(alphabet.charAt(Math.random() * alphabet.length), i * fontSize, (rainDrops[i].y - 1) * fontSize);
-
-                // 3. Çok daha sönük arka plan karakterleri (Derinlik hissi)
-                ctx.fillStyle = '#003300';
-                ctx.shadowBlur = 0;
-                ctx.fillText(text, i * fontSize, (rainDrops[i].y - 5) * fontSize);
-
-                // Hareketi güncelle
-                if (rainDrops[i].y * fontSize > canvas.height && Math.random() > 0.975) {
-                    rainDrops[i].y = 0;
-                }
-                
-                rainDrops[i].y += rainDrops[i].speed;
-            }
-        };
-
-        // Pencere yeniden boyutlandırma
-        window.addEventListener('resize', () => {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        });
-
-        // Akıcılık için 30-60 FPS arası döngü
-        setInterval(draw, 35);
-    </script>
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5RJ4ST6" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+	<div class="wrap">
+		<div class="middle">
+		<h1>Installing Updates</h1>
+		<p>Your PC will restart several times. Sit back and relax.</p>
+			<div class="progress-bar">
+				<div class="background"></div>
+				<div class="rotate"></div>
+				<div class="left"></div>
+				<div class="right"></div>
+				<div>
+					<span><a id="timer">0%</a></span>
+				</div>
+			</div>
+		</div>
+		<p class="bottom"><span>Installing&nbsp;features&nbsp;and&nbsp;drivers</span> <span id="percentbottom">0%</span> Configuring&nbsp;settings</p>
+	</div>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"46778338bbea44a7bcc4790b548e0a93","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 </body>
 </html>
