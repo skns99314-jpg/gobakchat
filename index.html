@@ -2,79 +2,72 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>GOBAK_TIKTOK_PLAYER_V9</title>
+    <title>GOBAK_TIKTOK_STREAM_V10</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@900&display=swap');
-        body {
-            margin: 0; background: #010101;
-            display: flex; flex-direction: column; align-items: center;
-            font-family: 'Orbitron', sans-serif; color: #fff;
-        }
-        .header { margin: 20px; color: #fe2c55; text-shadow: 0 0 10px #fe2c55; }
+        body, html { margin: 0; padding: 0; height: 100%; width: 100%; background: #000; overflow: hidden; }
         
-        /* GERÇEK PLAYER KUTUSU */
-        #video-stage {
-            width: 360px; height: 640px;
-            background: #111; border: 4px solid #fe2c55;
-            border-radius: 15px; overflow: hidden;
-            position: relative; box-shadow: 0 0 30px rgba(254, 44, 85, 0.3);
+        /* ANA EKRAN */
+        .app-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
-        iframe { width: 100%; height: 100%; border: none; }
-
-        .input-box { margin: 20px; }
-        input {
-            padding: 12px; background: #222; border: 1px solid #fe2c55;
-            color: #fff; width: 250px; border-radius: 5px;
+        /* TIKTOK KUTUSU (MOBIL BOYUT) */
+        .phone-frame {
+            width: 450px; /* Bilgisayarda tam düzgün görünmesi için ideal boyut */
+            height: 90vh;
+            border: 10px solid #222;
+            border-radius: 30px;
+            overflow: hidden;
+            box-shadow: 0 0 50px rgba(254, 44, 85, 0.5);
+            background: #000;
         }
-        button {
-            padding: 12px 20px; background: #fe2c55; border: none;
-            color: #fff; cursor: pointer; border-radius: 5px; font-weight: bold;
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* GİZLİ REFRESH TUŞU */
+        #refresh {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #fe2c55;
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 0 15px #fe2c55;
         }
     </style>
 </head>
 <body>
 
-    <h1 class="header">GOBAK_PHANTOM TV</h1>
-
-    <div id="video-stage">
-        <div id="placeholder" style="padding: 100px 20px; text-align: center;">
-            VIDEO ID GİRİN VE BAŞLATIN
+    <div class="app-container">
+        <div class="phone-frame">
+            <iframe 
+                id="gobak-stream"
+                src="https://www.tiktok.com/embed/v2/explore?lang=tr-TR"
+                allow="autoplay; encrypted-media; fullscreen"
+                allowfullscreen>
+            </iframe>
         </div>
     </div>
 
-    <div class="input-box">
-        <input type="text" id="targetId" placeholder="Örn: 7367382291...">
-        <button onclick="playNow()">BAŞLAT</button>
-    </div>
-
-    <p style="font-size: 10px; color: #555;">Kendi bilgisayarında tam erişim modu aktif.</p>
+    <button id="refresh" onclick="location.reload()">🔄</button>
 
     <script>
-        function playNow() {
-            let input = document.getElementById('targetId').value;
-            let videoId = "";
-
-            // Linkten ID'yi ayıkla
-            if(input.includes("video/")) {
-                videoId = input.split("video/")[1].split("?")[0];
-            } else {
-                videoId = input;
-            }
-
-            if(videoId.length > 5) {
-                const stage = document.getElementById('video-stage');
-                // TikTok'un kısıtlamasız "v.2" player yapısını kullanıyoruz
-                stage.innerHTML = `
-                    <iframe 
-                        src="https://www.tiktok.com/player/v1/${videoId}?autoplay=1" 
-                        allow="autoplay; fullscreen" 
-                        allowfullscreen>
-                    </iframe>`;
-            } else {
-                alert("Lütfen geçerli bir Video ID gir!");
-            }
-        }
+        // Sayfa her yüklendiğinde farklı videoların gelmesi için 
+        // TikTok'un cache (önbellek) sistemini küçük bir hileyle atlıyoruz
+        const frame = document.getElementById('gobak-stream');
+        frame.src = frame.src + "&t=" + new Date().getTime();
     </script>
 </body>
 </html>
