@@ -2,146 +2,96 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>EĞİTİM_PORTALI_V4 // GOBAK_DERS_NOTLARI</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SİSTEM_GÜNCELLEME // KURUMSAL_ERİŞİM</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;700&display=swap');
-        
-        body {
+        body, html {
             margin: 0;
-            background: #f0f2f5; /* MEB sitelerine benzer resmi bir gri */
-            font-family: 'Roboto', sans-serif;
+            padding: 0;
+            height: 100%;
+            width: 100%;
             overflow: hidden;
+            background-color: #000;
         }
 
-        /* GİZLEME PANELİ: MEB YÖNETİCİLERİ İÇİN SAHTE ARAYÜZ */
-        #meb-mask {
+        /* MEB KORUMA KALKANI - Gizli bir 'Acil Durum' butonu */
+        #panic-button {
             position: fixed;
-            top: 0; left: 0; width: 100%;
-            height: 50px;
-            background: #1a5c96;
-            color: white;
-            display: flex;
-            align-items: center;
-            padding: 0 20px;
-            font-size: 14px;
-            z-index: 1000;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            z-index: 9999;
+            cursor: pointer;
         }
+        #panic-button:hover { background: rgba(255,255,255,0.1); }
 
-        /* ANA TİKTOK ALANI */
-        #content-wrapper {
-            margin-top: 60px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            height: calc(100vh - 60px);
-        }
-
-        .video-container {
-            width: 325px;
-            height: 580px;
-            background: #000;
-            border-radius: 20px;
-            border: 8px solid #333;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-            overflow: hidden;
-            position: relative;
-        }
-
-        iframe {
+        /* TIKTOK AYNA ALANI */
+        .mirror-container {
+            position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
             height: 100%;
             border: none;
         }
 
-        .controls {
-            margin-top: 20px;
-            display: flex;
-            gap: 10px;
-        }
-
-        input {
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            width: 200px;
-        }
-
-        button {
-            padding: 10px 20px;
-            background: #1a5c96;
-            color: white;
+        #tiktok-frame {
+            width: 100%;
+            height: 100%;
             border: none;
-            border-radius: 5px;
-            cursor: pointer;
         }
 
-        /* SİBER KORUMA: LOG ANALİZİ GİZLEME */
-        .secure-layer {
+        /* SAHTE YÜKLENİYOR EKRANI (MEB LOGOLU) */
+        #loader {
             position: fixed;
-            bottom: 10px;
-            right: 10px;
-            font-size: 10px;
-            color: #aaa;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #fff;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            transition: 0.5s;
         }
     </style>
 </head>
 <body>
 
-    <div id="meb-mask">
-        <strong>MİLLİ EĞİTİM BAKANLIĞI</strong> &nbsp; | &nbsp; Etkileşimli İçerik ve Video Analiz Modülü (VAM)
+    <!-- Bir öğretmen gelirse buraya tıkla, anında Google Eğitim açılır -->
+    <div id="panic-button" onclick="panic()"></div>
+
+    <div id="loader">
+        <img src="https://upload.wikimedia.org/wikipedia/tr/b/bc/T.C._Mill%C3%AE_E%C4%9Fitim_Bakanl%C4%B1%C4%9F%C4%B1_logo.png" width="100">
+        <p style="font-family: sans-serif; color: #666; margin-top: 20px;">Eğitim İçerikleri Senkronize Ediliyor...</p>
     </div>
 
-    <div id="content-wrapper">
-        <div class="video-container" id="player-box">
-            <!-- Video buraya yüklenecek -->
-            <div style="color:white; text-align:center; margin-top:250px;">VIDEO YÜKLENİYOR...</div>
-        </div>
-
-        <div class="controls">
-            <input type="text" id="videoUrl" placeholder="Video ID veya Link girin...">
-            <button onclick="loadVideo()">İZLE</button>
-        </div>
-        
-        <p style="color:#666; font-size:12px; margin-top:10px;">
-            *Bu modül eğitim amaçlı video akışlarını stabilize etmek için tasarlanmıştır.
-        </p>
+    <div class="mirror-container">
+        <!-- Gerçek TikTok Akışı (Explore Sayfası) -->
+        <iframe 
+            id="tiktok-frame" 
+            src="https://www.tiktok.com/embed/v2/explore?lang=tr-TR" 
+            allow="autoplay; encrypted-media; fullscreen"
+            onload="hideLoader()">
+        </iframe>
     </div>
-
-    <div class="secure-layer">ENCRYPTED_BY_GOBAK_PHANTOM</div>
 
     <script>
-        function loadVideo() {
-            const input = document.getElementById('videoUrl').value;
-            let videoId = "";
-
-            // Linkten ID çıkarma mantığı
-            if(input.includes("video/")) {
-                videoId = input.split("video/")[1].split("?")[0];
-            } else if(input.length > 10) {
-                videoId = input;
-            }
-
-            if(videoId) {
-                const container = document.getElementById('player-box');
-                // MEB engellerini aşmak için resmi embed köprüsü kullanılır
-                container.innerHTML = `
-                    <iframe 
-                        src="https://www.tiktok.com/embed/v2/${videoId}?lang=tr-TR&autoplay=1" 
-                        allow="autoplay; encrypted-media" 
-                        allowfullscreen>
-                    </iframe>`;
-            } else {
-                alert("Geçerli bir Video ID veya Link girin!");
-            }
+        function hideLoader() {
+            setTimeout(() => {
+                document.getElementById('loader').style.opacity = "0";
+                setTimeout(() => {
+                    document.getElementById('loader').style.display = "none";
+                }, 500);
+            }, 1500);
         }
 
-        // Akıllı tahta için klavye desteği
-        document.getElementById('videoUrl').addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') {
-                loadVideo();
-            }
-        });
+        function panic() {
+            window.location.href = "https://www.google.com/search?q=eba+giriş";
+        }
+
+        // Akıllı tahta için dokunmatik kaydırma simülasyonu fısıltısı
+        console.log("PHANTOM_BYPASS: TikTok Engine Active.");
     </script>
 </body>
 </html>
