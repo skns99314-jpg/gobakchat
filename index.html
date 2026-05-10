@@ -3,267 +3,366 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ECHO_ULTIMATE_ACCESS</title>
+    <title>ECHO_OS | KERNEL_LEVEL_ACCESS</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Source+Code+Pro:wght@300;500&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;500;700&family=Orbitron:wght@400;900&display=swap');
 
         :root {
-            --primary: #00ff41;
-            --secondary: #008f11;
-            --accent: #003b00;
-            --danger: #ff003c;
-            --bg: #020202;
-            --glass: rgba(0, 20, 0, 0.85);
+            --neon-green: #00ff41;
+            --dark-green: #003b00;
+            --pure-black: #050505;
+            --alert-red: #ff003c;
+            --cyber-blue: #00d2ff;
+            --glass-bg: rgba(0, 20, 0, 0.9);
+            --crt-overlay: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; cursor: crosshair; }
 
         body {
-            background-color: var(--bg);
-            color: var(--primary);
-            font-family: 'Source Code Pro', monospace;
+            background-color: var(--pure-black);
+            color: var(--neon-green);
+            font-family: 'Fira Code', monospace;
             height: 100vh;
+            width: 100vw;
             overflow: hidden;
-            perspective: 1000px;
+            display: grid;
+            grid-template-columns: 250px 1fr 300px;
+            grid-template-rows: 40px 1fr 200px;
+            gap: 5px;
+            padding: 5px;
         }
 
-        /* MATRIX YAĞMURU ARKA PLANI */
-        #matrix-canvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            z-index: 1;
-            opacity: 0.3;
-        }
-
-        .overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle, transparent 20%, var(--bg) 150%);
-            z-index: 2;
-            pointer-events: none;
-        }
-
-        /* ANA KONTEYNER */
-        .main-frame {
-            position: relative;
-            z-index: 3;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100%;
-        }
-
-        .login-module {
-            background: var(--glass);
-            border: 2px solid var(--primary);
-            padding: 40px;
-            width: 450px;
-            position: relative;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 0 50px var(--accent), inset 0 0 20px var(--accent);
-            animation: glitch-border 5s infinite;
-        }
-
-        @keyframes glitch-border {
-            0%, 100% { border-color: var(--primary); }
-            50% { border-color: var(--secondary); box-shadow: 0 0 70px var(--primary); }
-            51% { border-color: var(--danger); }
-            52% { border-color: var(--primary); }
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-            font-family: 'Orbitron', sans-serif;
-            text-transform: uppercase;
-            letter-spacing: 5px;
-        }
-
-        .header h1 {
-            font-size: 1.5rem;
-            animation: text-pulse 2s infinite;
-        }
-
-        @keyframes text-pulse {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.7; transform: scale(0.98); text-shadow: 0 0 20px var(--primary); }
-        }
-
-        .input-group {
-            position: relative;
-            margin-bottom: 25px;
-        }
-
-        .input-group label {
+        /* --- CRT VE TARAMA EFEKTLERİ --- */
+        body::before {
+            content: " ";
             display: block;
-            font-size: 0.8rem;
-            margin-bottom: 8px;
-            color: var(--secondary);
+            position: absolute;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: var(--crt-overlay);
+            z-index: 9999;
+            pointer-events: none;
+            background-size: 100% 3px, 3px 100%;
         }
 
-        .input-group input {
-            width: 100%;
-            padding: 12px;
-            background: rgba(0, 59, 0, 0.2);
-            border: 1px solid var(--secondary);
-            color: var(--primary);
-            font-family: inherit;
-            outline: none;
+        /* --- ÜST PANEL (NAV) --- */
+        nav {
+            grid-column: 1 / -1;
+            background: var(--dark-green);
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.8rem;
+            border: 1px solid var(--neon-green);
+            justify-content: space-between;
+        }
+
+        /* --- SOL PANEL (SİSTEM DOSYALARI) --- */
+        aside.left-panel {
+            grid-row: 2 / 4;
+            background: var(--glass-bg);
+            border: 1px solid var(--neon-green);
+            padding: 15px;
+            overflow-y: auto;
+        }
+
+        .file-tree div {
+            margin: 8px 0;
+            padding-left: 15px;
+            border-left: 1px solid var(--dark-green);
             transition: 0.3s;
         }
 
-        .input-group input:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 15px var(--accent);
-            background: rgba(0, 59, 0, 0.4);
+        .file-tree div:hover {
+            color: var(--cyber-blue);
+            text-shadow: 0 0 10px var(--cyber-blue);
         }
 
-        .btn-access {
-            width: 100%;
-            padding: 15px;
-            background: var(--primary);
-            color: var(--bg);
+        /* --- ANA TERMİNAL (MERKEZ) --- */
+        main.terminal-core {
+            grid-row: 2;
+            background: rgba(0, 0, 0, 0.95);
+            border: 1px solid var(--neon-green);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            overflow: hidden;
+            box-shadow: inset 0 0 30px var(--dark-green);
+        }
+
+        #output {
+            flex-grow: 1;
+            overflow-y: auto;
+            font-size: 0.9rem;
+            line-height: 1.4;
+            margin-bottom: 10px;
+        }
+
+        .input-area {
+            display: flex;
+            border-top: 1px solid var(--dark-green);
+            padding-top: 10px;
+        }
+
+        .input-area input {
+            background: transparent;
             border: none;
-            font-family: 'Orbitron', sans-serif;
-            font-weight: bold;
+            color: var(--neon-green);
+            flex-grow: 1;
+            font-family: inherit;
+            outline: none;
             font-size: 1rem;
-            cursor: pointer;
-            transition: 0.4s;
+        }
+
+        /* --- ALT PANEL (LOGS) --- */
+        footer.logs {
+            grid-column: 2;
+            grid-row: 3;
+            background: var(--glass-bg);
+            border: 1px solid var(--neon-green);
+            padding: 10px;
+            font-size: 0.7rem;
+            overflow-y: auto;
+        }
+
+        /* --- SAĞ PANEL (NETWORK) --- */
+        aside.right-panel {
+            grid-row: 2 / 4;
+            background: var(--glass-bg);
+            border: 1px solid var(--neon-green);
+            padding: 15px;
+        }
+
+        .stat-bar {
+            height: 10px;
+            background: var(--dark-green);
+            margin: 10px 0;
             position: relative;
             overflow: hidden;
         }
 
-        .btn-access:hover {
-            background: var(--bg);
-            color: var(--primary);
-            box-shadow: 0 0 30px var(--primary);
-        }
-
-        /* SCANLINE EFEKTİ */
-        .scanlines {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
+        .stat-progress {
             height: 100%;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
-            background-size: 100% 4px, 3px 100%;
-            z-index: 10;
-            pointer-events: none;
+            background: var(--neon-green);
+            width: 0%;
+            transition: width 0.5s;
         }
 
-        /* DURUM PANELİ */
-        .status-panel {
-            position: absolute;
-            bottom: 10px;
-            right: 10px;
-            font-size: 0.7rem;
-            text-align: right;
-            line-height: 1.5;
-            color: var(--secondary);
+        /* --- SİSTEM EFEKTLERİ --- */
+        .glitch { animation: glitch 0.3s infinite; }
+        @keyframes glitch {
+            0% { transform: translate(0); }
+            20% { transform: translate(-2px, 2px); }
+            40% { transform: translate(-2px, -2px); }
+            60% { transform: translate(2px, 2px); }
+            80% { transform: translate(2px, -2px); }
+            100% { transform: translate(0); }
         }
 
-        .hud-ring {
-            position: absolute;
-            width: 600px;
-            height: 600px;
-            border: 1px dashed var(--accent);
-            border-radius: 50%;
-            animation: rotate 20s linear infinite;
-            z-index: 2;
+        .loading-screen {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: black;
+            z-index: 10000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
         }
-
-        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
-    <canvas id="matrix-canvas"></canvas>
-    <div class="overlay"></div>
-    <div class="scanlines"></div>
-
-    <div class="main-frame">
-        <div class="hud-ring"></div>
-        <div class="login-module">
-            <div class="header">
-                <h1>ECHO CORE v3</h1>
-                <small id="coord">LAT: 0.000 / LONG: 0.000</small>
-            </div>
-
-            <div class="input-group">
-                <label>GÜVENLİK ANAHTARI</label>
-                <input type="text" placeholder="ID: 0x992..." id="uid">
-            </div>
-
-            <div class="input-group">
-                <label>ŞİFRELEME DİZİNİ</label>
-                <input type="password" placeholder="••••••••" id="pass">
-            </div>
-
-            <button class="btn-access" onclick="authenticate()">ERİŞİM SAĞLA</button>
-
-            <div id="msg" style="margin-top: 15px; font-size: 0.8rem; height: 20px;"></div>
+    <div class="loading-screen" id="loader">
+        <h1 class="glitch">INITIALIZING ECHO_OS...</h1>
+        <div style="width: 300px; height: 2px; background: #003b00; margin-top: 20px;">
+            <div id="load-progress" style="width: 0%; height: 100%; background: #00ff41;"></div>
         </div>
     </div>
 
-    <div class="status-panel">
-        SİSTEM: AKTİF<br>
-        BAĞLANTI: ŞİFRELİ (AES-256)<br>
-        KONUM: <span id="loc">TÜRKİYE / KONYA</span><br>
-        HEDEF: ECHO_PROTOCOL
-    </div>
+    <nav>
+        <span>SYSTEM STATUS: <span id="pulse-node">STABLE</span></span>
+        <span id="clock">00:00:00</span>
+        <span>NODE: KONYA_SERVER_01</span>
+    </nav>
+
+    <aside class="left-panel">
+        <h3>FILE_EXPLORER</h3>
+        <div class="file-tree">
+            <div>📁 Root
+                <div>📁 bin</div>
+                <div>📁 etc</div>
+                <div>📁 home
+                    <div>📁 echo
+                        <div>📄 profile.dat</div>
+                        <div>📄 keys.gpg</div>
+                    </div>
+                </div>
+                <div>📁 var</div>
+                <div>📄 kernel.sys</div>
+            </div>
+        </div>
+    </aside>
+
+    <main class="terminal-core">
+        <div id="output"></div>
+        <div class="input-area">
+            <span style="margin-right: 10px;">root@echo_v3:~#</span>
+            <input type="text" id="cmdInput" autofocus>
+        </div>
+    </main>
+
+    <aside class="right-panel">
+        <h3>NETWORK_MONITOR</h3>
+        <div>CPU USAGE
+            <div class="stat-bar"><div class="stat-progress" id="cpu-bar"></div></div>
+        </div>
+        <div>RAM USAGE
+            <div class="stat-bar"><div class="stat-progress" id="ram-bar"></div></div>
+        </div>
+        <div>NET TRAFFIC
+            <canvas id="net-canvas" width="270" height="100"></canvas>
+        </div>
+        <div style="margin-top: 20px; font-size: 0.8rem; color: var(--cyber-blue);">
+            ACTIVE CONNECTIONS:
+            <ul id="conn-list" style="list-style: none; margin-top: 5px;"></ul>
+        </div>
+    </aside>
+
+    <footer class="logs" id="log-window">
+        [SYS_LOG]: Kernel initialized...
+    </footer>
 
     <script>
-        // MATRIX EFEKTİ
-        const canvas = document.getElementById('matrix-canvas');
-        const ctx = canvas.getContext('2d');
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
+        // KAPSAMLI SİSTEM MANTIĞI
+        const cmdInput = document.getElementById('cmdInput');
+        const output = document.getElementById('output');
+        const logWindow = document.getElementById('log-window');
 
-        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789$+-*/=%\"'#&_(),.;:?!\\|{}<>[]^~";
-        const fontSize = 14;
-        const columns = canvas.width / fontSize;
-        const drops = [];
-        for (let i = 0; i < columns; i++) drops[i] = 1;
-
-        function drawMatrix() {
-            ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = "#00ff41";
-            ctx.font = fontSize + "px monospace";
-            for (let i = 0; i < drops.length; i++) {
-                const text = chars.charAt(Math.floor(Math.random() * chars.length));
-                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
-                drops[i]++;
+        // YÜKLEME SİMÜLASYONU
+        let load = 0;
+        const loadInt = setInterval(() => {
+            load += Math.random() * 15;
+            document.getElementById('load-progress').style.width = load + "%";
+            if(load >= 100) {
+                clearInterval(loadInt);
+                document.getElementById('loader').style.display = 'none';
+                printOutput("ECHO_OS v3.0.0.1 Loaded.", "success-msg");
+                printOutput("Type 'help' to see unauthorized commands.");
             }
-        }
-        setInterval(drawMatrix, 33);
+        }, 150);
 
-        // KOORDİNAT SİMÜLASYONU
-        document.addEventListener('mousemove', (e) => {
-            document.getElementById('coord').innerText = `X: ${e.clientX} / Y: ${e.clientY}`;
+        // SAAT
+        setInterval(() => {
+            document.getElementById('clock').innerText = new Date().toLocaleTimeString();
+        }, 1000);
+
+        // KOMUT SİSTEMİ
+        const fileSystem = {
+            'kernel.sys': 'CORE KERNEL DATA: [ENCRYPTED]',
+            'profile.dat': 'USER: ECHO | RANK: ADMIN | CLEARANCE: LEVEL_9'
+        };
+
+        cmdInput.addEventListener('keydown', (e) => {
+            if(e.key === 'Enter') {
+                const rawVal = cmdInput.value;
+                const [cmd, ...args] = rawVal.toLowerCase().split(' ');
+                
+                printOutput(`<span style="color:#888">root@echo:~$</span> ${rawVal}`);
+
+                switch(cmd) {
+                    case 'help':
+                        printOutput("Available: ls, cat, scan, clear, hack, exploit, exit");
+                        break;
+                    case 'ls':
+                        printOutput("bin/  etc/  home/  var/  kernel.sys  profile.dat");
+                        break;
+                    case 'cat':
+                        if(fileSystem[args[0]]) printOutput(fileSystem[args[0]]);
+                        else printOutput("Error: File not found or access denied.", "error-msg");
+                        break;
+                    case 'scan':
+                        printOutput("Scanning local network...");
+                        simulateProgress(2000, "Scan Complete: 3 hosts found.");
+                        break;
+                    case 'hack':
+                        if(!args[0]) printOutput("Error: No target specified.");
+                        else {
+                            printOutput(`Injecting payload into ${args[0]}...`);
+                            simulateProgress(3000, "SHELL ACCESS GRANTED.");
+                        }
+                        break;
+                    case 'clear':
+                        output.innerHTML = "";
+                        break;
+                    default:
+                        printOutput(`Command '${cmd}' not recognized.`, "error-msg");
+                }
+                cmdInput.value = "";
+                output.scrollTop = output.scrollHeight;
+            }
         });
 
-        function authenticate() {
-            const msg = document.getElementById('msg');
-            msg.innerText = "ŞİFRELER ÇÖZÜLÜYOR...";
-            msg.style.color = "#00ff41";
+        function printOutput(text, className = "") {
+            const div = document.createElement('div');
+            div.className = className;
+            div.innerHTML = `> ${text}`;
+            output.appendChild(div);
             
-            setTimeout(() => {
-                msg.innerText = "ERİŞİM REDDEDİLDİ: YETERSİZ YETKİ";
-                msg.style.color = "#ff003c";
-                // Sarsıntı efekti
-                document.querySelector('.login-module').style.animation = 'none';
-                setTimeout(() => {
-                    document.querySelector('.login-module').style.animation = 'glitch-border 0.2s infinite';
-                }, 10);
-            }, 2000);
+            const log = document.createElement('div');
+            log.innerText = `[${new Date().toLocaleTimeString()}] ${text}`;
+            logWindow.prepend(log);
         }
+
+        function simulateProgress(time, finalMsg) {
+            let p = 0;
+            const int = setInterval(() => {
+                p += 10;
+                printOutput(`Progress: [${'#'.repeat(p/10)}${'.'.repeat(10-p/10)}] ${p}%`);
+                if(p >= 100) {
+                    clearInterval(int);
+                    printOutput(finalMsg, "success-msg");
+                }
+            }, time/10);
+        }
+
+        // DİNAMİK İSTATİSTİKLER
+        setInterval(() => {
+            document.getElementById('cpu-bar').style.width = Math.floor(Math.random() * 100) + "%";
+            document.getElementById('ram-bar').style.width = Math.floor(Math.random() * 100) + "%";
+            
+            if(Math.random() > 0.8) {
+                const li = document.createElement('li');
+                li.innerText = `192.168.1.${Math.floor(Math.random()*255)}: CONNECTED`;
+                li.style.color = "var(--neon-green)";
+                document.getElementById('conn-list').prepend(li);
+                if(document.getElementById('conn-list').children.length > 5) {
+                    document.getElementById('conn-list').lastChild.remove();
+                }
+            }
+        }, 1000);
+
+        // NETWORK CANVAS
+        const nCanvas = document.getElementById('net-canvas');
+        const nCtx = nCanvas.getContext('2d');
+        let x = 0;
+        function drawNet() {
+            nCtx.strokeStyle = "#00ff41";
+            nCtx.beginPath();
+            nCtx.moveTo(x, 50);
+            nCtx.lineTo(x + 5, 50 + (Math.random() * 40 - 20));
+            nCtx.stroke();
+            x += 5;
+            if(x > nCanvas.width) {
+                x = 0;
+                nCtx.clearRect(0,0, nCanvas.width, nCanvas.height);
+            }
+            requestAnimationFrame(drawNet);
+        }
+        drawNet();
+
     </script>
 </body>
 </html>
