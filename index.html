@@ -39,8 +39,8 @@
     // Saniyede 500 mesaj için gecikme yaklaşık 2ms
     // Ancak tarayıcı her 2ms'de bir ekrana çizim yapamaz.
     // Bu yüzden performansı artırmak için her döngüde 10'arlı mesaj basıyoruz.
-    const batchSize = 20; 
-    const floodSpeed = 100; // 1000ms / (500/10) = 20ms
+    const batchSize = 10; 
+    const floodSpeed = 20; // 1000ms / (500/10) = 20ms
 
     function startFlooding() {
         setInterval(() => {
