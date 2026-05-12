@@ -1,0 +1,241 @@
+<?php
+$customCSS = array(
+);
+$customJAVA = array(
+	'<script src="../../assets/plugins/@highlightjs/cdn-assets/highlight.min.js"></script>',
+	'<script src="../../assets/js/demo/highlightjs.demo.js"></script>',
+	'<script src="../../assets/plugins/datatables.net/js/jquery.dataTables.min.js"></script>',
+	'<script src="../../assets/plugins/datatables.net-bs5/js/dataTables.bootstrap5.min.js"></script>',
+	'<script src="../../assets/plugins/datatables.net-buttons/js/dataTables.buttons.min.js"></script>',
+	'<script src="../../assets/plugins/datatables.net-buttons/js/buttons.colVis.min.js"></script>',
+	'<script src="../../assets/plugins/datatables.net-buttons/js/buttons.flash.min.js"></script>',
+	'<script src="../../assets/plugins/datatables.net-buttons/js/buttons.html5.min.js"></script>',
+	'<script src="../../assets/plugins/datatables.net-buttons/js/buttons.print.min.js"></script>',
+	'<script src="../../assets/plugins/datatables.net-buttons-bs5/js/buttons.bootstrap5.min.js"></script>',
+	'<script src="../../assets/plugins/datatables.net-responsive/js/dataTables.responsive.min.js"></script>',
+	'<script src="../../assets/plugins/datatables.net-responsive-bs5/js/responsive.bootstrap5.min.js"></script>',
+	'<script src="../../assets/plugins/bootstrap-table/dist/bootstrap-table.min.js"></script>',
+	'<script src="../../assets/js/demo/table-plugins.demo.js"></script>',
+	'<script src="../../assets/js/demo/sidebar-scrollspy.demo.js"></script>',
+	'<script src="../../assets/plugins/jquery.toast/jquery.toast.js"></script>',
+	'<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.3.0/dist/sweetalert2.all.min.js"></script>',
+	
+
+);
+
+$page_title = 'Ad Soyad';
+include('inc/header_main.php');
+include('inc/header_native.php');
+
+error_reporting(0);
+?>
+
+
+	
+<body>
+	
+	<!-- BEGIN #app -->
+	<div id="app" class="app">
+		
+	       <?php
+		include 'inc/header_sidebar.php';
+		?>
+		<!-- BEGIN #content -->
+		<div id="content" class="app-content">
+			<!-- BEGIN row -->
+				<div class="row justify-content-center">
+					<!-- BEGIN col-10 -->
+					<div class="col-xl-12">
+						<!-- BEGIN row -->
+						<div class="row">
+							<!-- BEGIN col-9 -->
+							<div class="col-xl-12">
+                <div class="card-body">
+                    <h4 class="card-title mb-4">Mernis 2023</h4>
+                    <p class="mb-1">
+                    <p>
+                        Sorgulanacak Kisinin Adi, Soyadi, Yasadigi Ili Giriniz.</br>
+                    </p>
+                    </p>
+                    <div class="block-content tab-content">
+                        <div class="tab-pane active" id="tc" role="tabpanel">
+                            <div style="display: flex; flex-direction: row;">
+                                <input style="margin-right: 50px;" class="form-control" type="text" id="ad" placeholder="Ad"><br>
+                                <input class="form-control" type="text" id="soyad" placeholder="Soyad"><br>
+                            </div>
+                            <br>
+                            <input class="form-control" type="text" id="adresil" placeholder="Adres Il"><br>
+                        </div>
+                        <center class="">
+                            <button onclick="checkNumber()" id="sorgula" name="yolla" class="btn waves-effect waves-light btn-rounded btn-success" style="width: 180px; height: 45px; outline: none; margin-left: 5px;"><i class="fas fa-search"></i> Sorgula <span id="sorgulanumber"></span></button>
+                            <button onclick="clearAll()" id="durdurButon" type="button" class="btn waves-effect waves-light btn-rounded btn-danger" style="width: 180px; height: 45px; outline: none; margin-left: 5px;"><i class="fas fa-trash-alt"></i> Sifirla </button>                     
+                        </center>
+                        <div class="table-responsive">
+
+                            <table id="zero-conf" class="table table-hover" style="width:100%">
+                                <thead>
+                                    <tr>
+                                        <th>Kimlik No</th>
+                                        <th>Adi</th>
+                                        <th>Soyadi</th>
+                                        <th>Dogum Tarihi</th>
+                                        <th>Nüfus Il</th>
+                                        <th>Nüfus Ilçe</th>
+                                        <th>Anne Adi</th>
+                                        <th>Anne Tc</th>
+                                        <th>Baba Adi</th>
+                                        <th>Baba Tc</th>
+                                        <th>Uyruk</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="jojjoojj">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function clearResults() {
+            $("#jojjoojj").html(' <tr class="odd"><td valign="top" colspan="11" class="dataTables_empty">No data available in table</td></tr>');
+        }
+
+        function clearValues() {
+            document.getElementById("tcno").value = "";
+            document.getElementById("ad").value = "";
+            document.getElementById("soyad").value = "";
+            document.getElementById("adresil").value = "";
+            document.getElementById("sorgulanumber").innerHTML = "";
+        }
+
+        function clearAll() {
+            clearResults()
+            clearValues()
+        }
+
+        function checkNumber() {
+            var tc = $("#tcno").val();
+            var ad = $("#ad").val();
+            var soyad = $("#soyad").val();
+            var adresil = $("#adresil").val();
+            $.Toast.showToast({
+                "title": "Sorgulaniyor...",
+                "icon": "loading",
+                "duration": 60000
+            });
+            $.ajax({
+                url: "../api/adsoyad/api.php",
+                type: "POST",
+                data: {
+                    tc: tc,
+                    ad: ad,
+                    soyad: soyad,
+                    adresil: adresil
+                },
+                success: (res) => {
+                    var json = res;
+
+                    $.Toast.hideToast();
+
+                    if (json.message === "cooldown error") {
+                        return Swal.fire({
+                            icon: 'warning',
+                            title: 'Ooooopss...',
+                            text: 'Çok sik sorgu yapiyorsunuz! Lütfen ' + json.remain + ' saniye bekleyin.',
+                        })
+                    }
+
+                    if (json.success === "true") {
+                        $.Toast.hideToast();
+
+                        clearResults();
+                        $("#jojjoojj").html("");
+                        document.getElementById("sorgulanumber").innerHTML = "(" + json.number + ")";
+
+                        var array = [];
+
+                        for (var i = 0; i < json.number; i++) {
+                            var data = json.data[i];
+                            var tc = data.TC;
+                            var name = data.ADI;
+                            var surname = data.SOYADI;
+                            var birthdate = data.DOGUMTARIHI;
+                            var il = data.NUFUSIL;
+                            var ilce = data.NUFUSILCE;
+                            var anneadi = data.ANNEADI;
+                            var annetc = data.ANNETC;
+                            var babaadi = data.BABAADI;
+                            var babatc = data.BABATC;
+                            var uyruk = data.UYRUK;
+
+
+                            result = "<tr>" +
+                                "<th>" +
+                                tc +
+                                "</th>" +
+                                "<th>" +
+                                name +
+                                "</th>" +
+                                "<th>" +
+                                surname +
+                                "</th>" +
+                                "<th>" +
+                                birthdate +
+                                "</th>" +
+                                "<th>" +
+                                il +
+                                "</th>" +
+                                "<th>" +
+                                ilce +
+                                "</th>" +
+                                "<th>" +
+                                anneadi +
+                                "</th>" +
+                                "<th>" +
+                                annetc +
+                                "</th>" +
+                                "<th>" +
+                                babaadi +
+                                "</th>" +
+                                "<th>" +
+                                babatc +
+                                "</th>" +
+                                "<th>" +
+                                uyruk +
+                                "</th>";
+
+                            array.push(result);
+
+                        }
+
+                        $("#jojjoojj").html(array)
+                    } else {
+                        $.Toast.hideToast();
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Bulunamadi!',
+                            text: 'Girdiginiz bilgiler ile eslesen bir kisi bulunamadi.',
+                        })
+                    }
+                },
+                error: () => {
+                    $.Toast.hideToast();
+                    Swal.fire({
+                        icon: 'error',
+                        title: "Sunucu hatasi!",
+                        text: 'Lütfen yönetici ile iletisime geçin.'
+                    })
+                }
+            })
+        }
+    </script>
+
+</div>
+<!--BITIS-->
+<?php
+include('inc/footer_native.php');
+include('inc/footer_main.php');
+?>
